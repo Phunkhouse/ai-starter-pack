@@ -1,6 +1,6 @@
 # AI starter pack
 
-A small, opinionated set of instructions and files for starting an application with Claude Code or Codex. It was distilled from Lucy's Bookshop, but contains no bookshop-specific business rules.
+A small, opinionated set of instructions and files for starting an application with Claude Code or Codex.
 
 ## Use it in a new repository
 
