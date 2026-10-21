@@ -11,9 +11,10 @@ A small, opinionated set of instructions and files for starting an application w
    rsync -a --ignore-existing /absolute/path/to/ai-starter-pack/template/core/ /absolute/path/to/new-project/
    ```
 
-3. Choose a [recipe](recipes/next-fullstack/README.md). For Next.js, inspect its `files/` directory and copy the files that fit your generated project. Compare any existing configuration before merging it; `--ignore-existing` deliberately leaves existing files untouched.
-4. Complete `docs/project.md` and adapt `AGENTS.md`. Replace its command placeholder with scripts that actually exist in the new `package.json`.
-5. Install and configure the tools described by the recipe, run the relevant checks, then commit the resulting project.
+3. Choose a [stack recipe](recipes/next-fullstack/README.md). For Next.js, inspect its `files/` directory and copy the files that fit your generated project. Compare any existing configuration before merging it; `--ignore-existing` deliberately leaves existing files untouched.
+4. If you want on-demand Claude reviews on GitHub pull requests, follow the optional [Claude PR review recipe](recipes/claude-pr-review/README.md).
+5. Complete `docs/project.md` and adapt `AGENTS.md`. Replace its command placeholder with scripts that actually exist in the new `package.json`.
+6. Install and configure the tools described by the selected recipes, run the relevant checks, then commit the resulting project.
 
 To delegate setup to an agent, use the [bootstrap prompt](BOOTSTRAP.md).
 
@@ -23,11 +24,12 @@ Use a lowercase type followed by a colon, a space and a short imperative summary
 
 ## Layout
 
-| Location                  | Purpose                                                                              |
-| ------------------------- | ------------------------------------------------------------------------------------ |
-| `template/core/`          | Shared agent instructions, project brief, decision record template and EditorConfig. |
-| `recipes/next-fullstack/` | Next.js setup guide and optional Next.js and JavaScript tooling files.               |
-| `BOOTSTRAP.md`            | Prompt for applying the pack to a new repository.                                    |
+| Location                    | Purpose                                                                              |
+| --------------------------- | ------------------------------------------------------------------------------------ |
+| `template/core/`            | Shared agent instructions, project brief, decision record template and EditorConfig. |
+| `recipes/next-fullstack/`   | Next.js setup guide and optional Next.js and JavaScript tooling files.               |
+| `recipes/claude-pr-review/` | Optional GitHub workflow and setup guide for `@claude review` on pull requests.       |
+| `BOOTSTRAP.md`              | Prompt for applying the pack to a new repository.                                    |
 
 More recipes can be added without making the core assume a framework or language. In particular, the Next.js ESLint config and Prettier preferences belong to its recipe, not to the core.
 
