@@ -11,6 +11,14 @@ An optional profile for a new TypeScript application. This recipe was drafted ag
 5. Add scripts in the new `package.json`: `lint: eslint .`, `typecheck: next typegen && tsc --noEmit`, `format: prettier --write .`, `format:check: prettier --check .`. Add a `test` script when there are tests. Next.js 16 runs ESLint directly; `next lint` was removed.
 6. Adapt the included pull-request CI workflow to the scripts actually installed. It runs format, lint, typecheck, optional tests and build. Add required services only when tests or the build need them. Keep branch protection aligned with the job name. CI is the required gate; a pre-commit hook is optional.
 
+## Testing on a phone
+
+For local device testing, connect the phone and development machine to the same network, make sure the dev server listens on an interface the phone can reach, and open `http://<development-machine-LAN-address>:3000` on the phone. If the page cannot connect, check the server's hostname binding, local firewall and network isolation before changing Next.js configuration.
+
+If Next.js rejects a request from that host as a cross-origin development request, add the development machine's host as seen by the phone to `allowedDevOrigins` in the target project's existing `next.config.ts`, then restart the dev server. For example, add `allowedDevOrigins: ['<development-machine-LAN-address>']` to the exported `NextConfig` object, replacing the placeholder with the actual hostname or IP address. Entries contain no `http://` or port. This setting affects development requests, not production access rules.
+
+A fixed LAN IP may change. If that becomes a problem, use a stable local hostname or a narrowly scoped pattern supported by the installed Next.js version. Current Next.js docs say `*` matches exactly one dot-separated hostname label; for example, `192.168.*.*` can accommodate changing addresses on a `192.168` network, but allows that whole range. Do not copy one household's IP address or broad private-network wildcards into every project. Check that the intended LAN host works and an unrelated host remains blocked.
+
 ## Architecture
 
 - Start with route files and components. Create `src/server/` when there is real business logic to isolate. If created, enforce its framework boundary with `no-restricted-imports` in ESLint.
@@ -32,3 +40,4 @@ An optional profile for a new TypeScript application. This recipe was drafted ag
 ## References to check when applying
 
 - The guide paths above were verified in an installed Next.js 16 package: `01-app/03-api-reference/05-config/03-eslint.md`, `01-app/02-guides/sass.md` and `01-app/02-guides/testing/vitest.md` under `node_modules/next/dist/docs/`. Find their equivalents in the target project; do not assume the same paths exist in a later version.
+- Check the installed version's [`allowedDevOrigins` documentation](https://nextjs.org/docs/app/api-reference/config/next-config-js/allowedDevOrigins) and [`next dev` hostname option](https://nextjs.org/docs/app/api-reference/cli/next) when enabling phone testing.
