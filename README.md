@@ -17,6 +17,10 @@ A small, opinionated set of instructions and files for starting an application w
 
 To delegate setup to an agent, use the [bootstrap prompt](BOOTSTRAP.md).
 
+## Commit messages
+
+Use a lowercase type followed by a colon, a space and a short imperative summary: `type: summary`. Choose `feat` for a new feature, `fix` for a bug fix, `docs` for documentation, `refactor` for a behavior-preserving code change, `test` for tests and `chore` for maintenance. For example: `feat: add search filters` or `docs: clarify setup steps`.
+
 ## Layout
 
 | Location                  | Purpose                                                                              |

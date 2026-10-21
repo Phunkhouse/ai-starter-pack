@@ -30,5 +30,6 @@ Before changing code, inspect the relevant files and the installed framework's d
 - Test important behavior and failure cases at the lowest useful level. Use real database integration tests for concurrency and transaction behavior.
 - Prefer role-based queries in UI tests. Do not use fixed sleeps to make tests pass.
 - Keep diffs focused. Explain meaningful dependency, schema and architecture decisions in the change description; record lasting trade-offs in `docs/decisions/`.
+- Name commits `type: short imperative summary`, using lowercase `feat`, `fix`, `docs`, `refactor`, `test` or `chore` as appropriate.
 - Before finishing, run the relevant checks, update affected documentation and commands, and mention unrelated changes without folding them into the task.
 - Do not commit secrets, `.env` files or personal data. If the project needs environment variables, create `.env.example` with names and safe examples only.
