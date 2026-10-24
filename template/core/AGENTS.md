@@ -1,6 +1,6 @@
 # Project instructions
 
-Purpose, users, scope and open questions: `docs/project.md`. Decision records: `docs/decisions/`.
+Project overview: `README.md`. Detailed scope, workflows, limitations and open questions: `docs/SPEC.md`. Approved design: `docs/design/`. Agreed development stages, when present: `docs/MILESTONES.md`. Decision records: `docs/decisions/`.
 
 Before changing code, inspect the relevant files and the installed framework's documentation. Do not assume that remembered APIs match this project.
 
@@ -22,7 +22,7 @@ Before changing code, inspect the relevant files and the installed framework's d
 ## UI
 
 - Prefer semantic HTML, keyboard access, visible focus and useful alternative text.
-- Follow the styling approach recorded in `docs/project.md`; keep repeated visual values consistent.
+- Follow the approved design in `docs/design/`; keep repeated visual values consistent.
 - Put user-facing copy in the project's chosen content or localization system when one exists.
 
 ## Testing and changes
