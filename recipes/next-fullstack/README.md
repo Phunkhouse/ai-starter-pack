@@ -34,6 +34,7 @@ A fixed LAN IP may change. If that becomes a problem, use a stable local hostnam
 ## Tests
 
 - Add Vitest unit tests for business rules when they exist, component tests with Testing Library for interactive UI, and a few Playwright tests for critical end-to-end flows.
+- When adding Playwright tests to CI, keep them in a separate E2E job and follow the optional [Playwright E2E CI recipe](../playwright-e2e/README.md). Do not run browser tests through the main job's `test` script.
 - Test async Server Components via end-to-end tests; the Next.js Vitest guide does not support them directly.
 - Add real database integration tests for transactional and concurrency risks.
 
