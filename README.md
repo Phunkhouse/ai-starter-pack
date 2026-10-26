@@ -12,7 +12,7 @@ A small, opinionated set of instructions and files for starting an application w
    ```
 
 3. Choose a [stack recipe](recipes/next-fullstack/README.md). For Next.js, inspect its `files/` directory and copy the files that fit your generated project. Compare any existing configuration before merging it; `--ignore-existing` deliberately leaves existing files untouched.
-4. Add optional integrations when useful: [Claude PR review](recipes/claude-pr-review/README.md) for on-demand GitHub reviews, or [Playwright E2E CI](recipes/playwright-e2e/README.md) for browser tests.
+4. Add optional integrations when useful: [Claude PR review](recipes/claude-pr-review/README.md) for on-demand GitHub reviews, or the [Playwright E2E CI guide](recipes/playwright-e2e/README.md) for choosing a browser-test setup.
 5. Adapt the target project's root `README.md` (the generator may already provide one), complete `docs/SPEC.md` and `docs/design/`, and adapt `AGENTS.md`. Add `docs/MILESTONES.md` when development stages are agreed. Replace the command placeholder in `AGENTS.md` with scripts that actually exist in the new `package.json`.
 6. Install and configure the tools described by the selected recipes, run the relevant checks, then commit the resulting project.
 
@@ -34,7 +34,7 @@ Use a lowercase type followed by a colon, a space and a short imperative summary
 | `template/optional/` | Milestone template to copy when development stages are agreed. |
 | `recipes/next-fullstack/` | Next.js setup guide and optional Next.js and JavaScript tooling files. |
 | `recipes/claude-pr-review/` | Optional GitHub workflow and setup guide for `@claude review` on pull requests. |
-| `recipes/playwright-e2e/` | Optional container-based CI workflow and setup guide for Playwright browser tests. |
+| `recipes/playwright-e2e/` | E2E CI decision guide and optional Playwright container workflow. |
 | `BOOTSTRAP.md` | Prompt for applying the pack to a new repository. |
 
 More recipes can be added without making the core assume a framework or language. In particular, the Next.js ESLint config and Prettier preferences belong to its recipe, not to the core.

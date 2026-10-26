@@ -1,5 +1,7 @@
 name: E2E
 
+# Optional container variant. Compare its complete job time with a runner-based job.
+
 on:
   pull_request:
 
