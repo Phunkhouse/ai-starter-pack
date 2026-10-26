@@ -33,3 +33,9 @@ Before changing code, inspect the relevant files and the installed framework's d
 - Name commits `type: short imperative summary`, using lowercase `feat`, `fix`, `docs`, `refactor`, `test` or `chore` as appropriate.
 - Before finishing, run the relevant checks, update affected documentation and commands, and mention unrelated changes without folding them into the task.
 - Do not commit secrets, `.env` files or personal data. If the project needs environment variables, create `.env.example` with names and safe examples only.
+
+## Pull requests
+
+- Work through multiple PRs sequentially. Keep at most one agent-authored PR awaiting user review at a time.
+- Finish checks and address feedback in the current PR. Wait for the user to merge or close it before starting the next PR's implementation, unless the user explicitly requests parallel PR work.
+- Leave the final merge to the user unless they explicitly ask you to perform it.

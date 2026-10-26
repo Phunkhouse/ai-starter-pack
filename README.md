@@ -26,6 +26,10 @@ When applying the pack to an existing repository, reconcile any earlier project 
 
 Use a lowercase type followed by a colon, a space and a short imperative summary: `type: summary`. Choose `feat` for a new feature, `fix` for a bug fix, `docs` for documentation, `refactor` for a behavior-preserving code change, `test` for tests and `chore` for maintenance. For example: `feat: add search filters` or `docs: clarify setup steps`.
 
+## Pull request cadence
+
+For work that needs several PRs, deliver one at a time. Let the user review and merge or close the current PR before starting the next implementation. Parallel PR work is an exception that the user must request explicitly.
+
 ## Layout
 
 | Location | Purpose |
