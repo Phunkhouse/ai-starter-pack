@@ -18,7 +18,7 @@ A small, opinionated set of instructions and files for starting an application w
 
 To delegate setup to an agent, use the [bootstrap prompt](BOOTSTRAP.md).
 
-When development stages are agreed, copy the optional [milestone template](template/optional/docs/MILESTONES.md) into the target project's `docs/` directory and replace its prompts with the actual plan.
+When development stages are agreed, copy the optional [milestone template](template/optional/docs/MILESTONES.md) into the target project's `docs/` directory and replace its prompts with the actual plan. Each milestone should have observable acceptance checks, a way to verify them and completion evidence. A milestone can span multiple PRs, which still follow the one-at-a-time review cadence.
 
 When applying the pack to an existing repository, reconcile any earlier project brief or specification with `docs/SPEC.md` so the project does not keep competing sources of truth.
 
