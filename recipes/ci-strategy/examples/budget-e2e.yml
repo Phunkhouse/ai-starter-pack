@@ -1,0 +1,50 @@
+name: E2E
+
+# Optional Playwright container variant, adapted to the project's exact version.
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review, converted_to_draft]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  browser_tests:
+    if: github.event_name != 'pull_request' || !github.event.pull_request.draft
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    container:
+      # Match the installed @playwright/test version exactly.
+      image: mcr.microsoft.com/playwright:v1.64.0-noble
+      options: --user 1001
+    env:
+      CI: 'true'
+    steps:
+      - uses: actions/checkout@v7
+      - uses: pnpm/action-setup@v6
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm test:e2e
+
+  # Retain the Standard example's required check name: playwright.
+  playwright:
+    needs: [browser_tests]
+    if: always()
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Require successful browser validation
+        env:
+          RESULT: ${{ needs.browser_tests.result }}
+        run: |
+          if [ "$RESULT" != success ]; then
+            echo "::error::Browser validation did not succeed (result: $RESULT). Drafts defer cloud validation."
+            exit 1
+          fi

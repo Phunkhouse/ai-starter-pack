@@ -9,8 +9,11 @@ The starter pack is at <absolute path to ai-starter-pack>.
 The target repository is at <absolute path to the new repository>.
 The relevant recipe is <recipe name, or none>.
 The optional integrations are <integration recipe names, or none>.
+The CI strategy is <Standard (default) or Budget-conscious>.
 
 Read the starter pack README.md, template/core/ and the selected recipes. Inspect the target repository and the documentation for the versions actually installed there.
+
+Read recipes/ci-strategy/README.md. Keep the project's CI provider and existing protections. Include its current triggers, required checks, available branch protections, local/cloud differences and any merge queue in the plan. Default to Standard when no strategy is specified. Record the selected strategy in AGENTS.md and adapt the existing CI without reducing pre-merge coverage. Prefer existing verification commands; add one unified command only when useful. Do not disable security, migration or deployment workflows to save validation minutes.
 
 First report a concise plan: the files you would copy or merge, package scripts and dependencies you would add, external integrations and repository secrets that need setup, checks you would run, and any conflicts or product choices that need my input. Wait for my approval before applying the plan.
 

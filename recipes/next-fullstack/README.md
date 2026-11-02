@@ -11,6 +11,8 @@ An optional profile for a new TypeScript application. This recipe was drafted ag
 5. Add scripts in the new `package.json`: `lint: eslint .`, `typecheck: next typegen && tsc --noEmit`, `format: prettier --write .`, `format:check: prettier --check .`. Add a `test` script when there are tests. Next.js 16 runs ESLint directly; `next lint` was removed.
 6. Adapt the included pull-request CI workflow to the scripts actually installed. It runs format, lint, typecheck, optional tests and build. Add required services only when tests or the build need them. Keep branch protection aligned with the job name. CI is the required gate; a pre-commit hook is optional.
 
+The included workflow uses Standard CI. For local verification commands, optional draft-based Budget-conscious CI and safe required checks, follow the [CI strategy recipe](../ci-strategy/README.md). Its budget example replaces this workflow; do not install both variants. Preserve the project's existing test suites when adapting either example.
+
 ## Testing on a phone
 
 For local device testing, connect the phone and development machine to the same network, make sure the dev server listens on an interface the phone can reach, and open `http://<development-machine-LAN-address>:3000` on the phone. If the page cannot connect, check the server's hostname binding, local firewall and network isolation before changing Next.js configuration.

@@ -12,6 +12,14 @@ Before changing code, inspect the relevant files and the installed framework's d
 
 <!-- After project setup, replace this block with actual scripts, e.g. pnpm check and pnpm format:check. -->
 
+## Validation strategy
+
+- CI strategy: Standard (default). Change this to Budget-conscious only when the user chooses it and the CI configuration implements it.
+- During development and before handing off work, run the relevant local formatting, lint, type, test and build checks using existing project commands. Use a unified verification command when useful; report results and local/cloud environment differences, including checks that could not run.
+- Standard runs cloud validation on relevant PR updates. Budget-conscious uses draft PRs while developing and defers expensive cloud jobs until ready for review; every subsequent commit to a ready PR still needs full cloud validation.
+- In Budget-conscious mode, create draft PRs and obtain explicit user permission before marking them ready. Permission to request review is not permission to merge. Do not bypass checks or change the strategy to avoid a failure.
+- Before any authorized merge, confirm successful independent CI for the current revision, including every required suite. Local results and earlier commits' CI do not replace it. Respect existing security, migration, deployment and branch rules.
+
 ## Architecture
 
 - Keep business rules separate from route handlers and UI components. Put validation and trust-boundary checks on the server.
