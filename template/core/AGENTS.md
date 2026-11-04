@@ -43,7 +43,14 @@ Before changing code, inspect the relevant files and the installed framework's d
 - If `docs/MILESTONES.md` exists, use its acceptance checks to guide the current milestone. Before calling a milestone complete, verify each check, record evidence and unresolved gaps there, and request user validation for product or visual judgments. A passing CI run alone does not establish that the intended outcome works.
 - Do not commit secrets, `.env` files or personal data. If the project needs environment variables, create `.env.example` with names and safe examples only.
 
+## Legal planning (when enabled)
+
+- Use `audit-legal-readiness` in Planning mode after the initial specification and before dependent implementation, then Pre-launch mode against the built product. Revisit the plan after material changes to markets, business model, features, suppliers or data uses.
+- Run either mode with a top-tier reasoning model and high reasoning effort or the closest supported equivalent. Announce the model/settings when known; warn if weaker or unverified. Prioritize source verification and completeness over token savings, and do not claim a model switch or review that did not occur.
+- Keep review output in `docs/audits/`. Promote approved requirements into `docs/SPEC.md` and milestone acceptance checks separately. Planned controls do not prove launch readiness; do not publish legal documents as part of the review.
+
 ## Pull requests
+
 
 - Work through multiple PRs sequentially. Keep at most one agent-authored PR awaiting user review at a time.
 - Finish checks and address feedback in the current PR. Wait for the user to merge or close it before starting the next PR's implementation, unless the user explicitly requests parallel PR work.

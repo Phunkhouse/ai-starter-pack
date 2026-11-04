@@ -10,12 +10,15 @@ The target repository is at <absolute path to the new repository>.
 The relevant recipe is <recipe name, or none>.
 The optional integrations are <integration recipe names, or none>.
 The CI strategy is <Standard (default) or Budget-conscious>.
+Legal planning is <enabled or omitted>.
 
 Read the starter pack README.md, template/core/ and the selected recipes. Inspect the target repository and the documentation for the versions actually installed there.
 
 Read recipes/ci-strategy/README.md. Keep the project's CI provider and existing protections. Include its current triggers, required checks, available branch protections, local/cloud differences and any merge queue in the plan. Default to Standard when no strategy is specified. Record the selected strategy in AGENTS.md and adapt the existing CI without reducing pre-merge coverage. Prefer existing verification commands; add one unified command only when useful. Do not disable security, migration or deployment workflows to save validation minutes.
 
 First report a concise plan: the files you would copy or merge, package scripts and dependencies you would add, external integrations and repository secrets that need setup, checks you would run, and any conflicts or product choices that need my input. Wait for my approval before applying the plan.
+
+When legal planning is enabled, follow recipes/legal-planning/README.md. After the initial specification and before feature implementation, invoke audit-legal-readiness in Planning mode with a top-tier reasoning model and high reasoning effort or the closest supported equivalent. Announce the known setup and warn if it is weaker or cannot be verified; prioritize thorough research over token savings. If the skill is unavailable, report the missing dependency rather than claiming the review ran. Keep its output under docs/audits/. Present the findings and material open questions before implementing dependent features; incorporate approved requirements into SPEC.md and milestone acceptance checks as a separate planning step. Plan a Pre-launch review against the actual product before release.
 
 After approval, adapt the applicable files without overwriting existing configuration blindly. Write a short root README.md explaining the project and how it works. Complete docs/SPEC.md from known information, reconciling any existing project brief so there is one source of truth; leave unknown product choices as open questions. Keep approved design decisions in docs/design/. Copy and complete template/optional/docs/MILESTONES.md only when the development stages are agreed; define observable acceptance checks and how to verify them for each milestone. Add focused documents such as docs/DEVELOPMENT.md when a procedure is too detailed for the specification. Keep only accurate rules and existing commands in AGENTS.md. Set up formatting, linting, type checking and a production build where applicable. Add test tooling when there is behavior worth testing; do not invent placeholder tests. Run the available checks and summarize the changes, results and unresolved questions.
 

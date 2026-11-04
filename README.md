@@ -18,6 +18,8 @@ A small, opinionated set of instructions and files for starting an application w
 
 To delegate setup to an agent, use the [bootstrap prompt](BOOTSTRAP.md).
 
+Optionally enable [legal planning](recipes/legal-planning/README.md) after the first specification and before feature implementation. It uses the external `audit-legal-readiness` skill in Planning mode, followed by a Pre-launch review of the built product. Both modes recommend a top-tier reasoning model with high reasoning effort and prioritize verified sources over token savings.
+
 Choose [Standard or Budget-conscious CI](recipes/ci-strategy/README.md) during setup or later. Standard is the default. Both use local validation and require the same independent cloud checks before merge; Budget-conscious keeps agent PRs in draft until the user authorizes review, deferring expensive cloud jobs. The policy is provider-independent, with optional GitHub Actions examples.
 
 When development stages are agreed, copy the optional [milestone template](template/optional/docs/MILESTONES.md) into the target project's `docs/` directory and replace its prompts with the actual plan. Each milestone should have observable acceptance checks, a way to verify them and completion evidence. A milestone can span multiple PRs, which still follow the one-at-a-time review cadence.
@@ -42,6 +44,7 @@ For work that needs several PRs, deliver one at a time. Let the user review and 
 | `recipes/claude-pr-review/` | Optional GitHub workflow and setup guide for `@claude review` on pull requests. |
 | `recipes/playwright-e2e/` | E2E CI decision guide and optional Playwright container workflow. |
 | `recipes/ci-strategy/` | Local validation policy, CI strategy selection and optional budget GitHub Actions examples. |
+| `recipes/legal-planning/` | Optional specification-based legal preparation and handoff to the external legal readiness skill. |
 | `BOOTSTRAP.md` | Prompt for applying the pack to a new repository. |
 
 More recipes can be added without making the core assume a framework or language. In particular, the Next.js ESLint config and Prettier preferences belong to its recipe, not to the core.
