@@ -43,6 +43,12 @@ Before changing code, inspect the relevant files and the installed framework's d
 - If `docs/MILESTONES.md` exists, use its acceptance checks to guide the current milestone. Before calling a milestone complete, verify each check, record evidence and unresolved gaps there, and request user validation for product or visual judgments. A passing CI run alone does not establish that the intended outcome works.
 - Do not commit secrets, `.env` files or personal data. If the project needs environment variables, create `.env.example` with names and safe examples only.
 
+## Scalability and cost planning (when enabled)
+
+- Use `audit-scalability-cost` in Planning mode for specification-based capacity and cost decisions. Prefer the smallest sufficient setup; distinguish proposed workloads and conditional estimates from measured usage or capacity.
+- Verify material prices, quotas and terms from current official sources. Include shared limits, CI/preview costs and operational effort when relevant; do not assume free service or billing caps.
+- Keep the report under `docs/audits/`; promote approved decisions, monitoring and measurable action triggers into `docs/SPEC.md` and milestone acceptance checks separately. Revisit assumptions after meaningful scope changes or first real usage data, using Audit mode for actual operation. Reviews do not authorize paid experiments or infrastructure changes.
+
 ## Legal planning (when enabled)
 
 - Use `audit-legal-readiness` in Planning mode after the initial specification and before dependent implementation, then Pre-launch mode against the built product. Revisit the plan after material changes to markets, business model, features, suppliers or data uses.
@@ -50,7 +56,6 @@ Before changing code, inspect the relevant files and the installed framework's d
 - Keep review output in `docs/audits/`. Promote approved requirements into `docs/SPEC.md` and milestone acceptance checks separately. Planned controls do not prove launch readiness; do not publish legal documents as part of the review.
 
 ## Pull requests
-
 
 - Work through multiple PRs sequentially. Keep at most one agent-authored PR awaiting user review at a time.
 - Finish checks and address feedback in the current PR. Wait for the user to merge or close it before starting the next PR's implementation, unless the user explicitly requests parallel PR work.

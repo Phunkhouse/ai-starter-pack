@@ -18,6 +18,8 @@ A small, opinionated set of instructions and files for starting an application w
 
 To delegate setup to an agent, use the [bootstrap prompt](BOOTSTRAP.md).
 
+At setup, offer [lightweight scalability and cost planning](recipes/scalability-planning/README.md) when workloads, storage, external APIs, jobs or reliability needs affect early decisions. It uses the external `audit-scalability-cost` skill in Planning mode. A simple static project may need only a brief relevance assessment. Start with the smallest sufficient setup, explicit assumptions and measurable triggers for revisiting it.
+
 Optionally enable [legal planning](recipes/legal-planning/README.md) after the first specification and before feature implementation. It uses the external `audit-legal-readiness` skill in Planning mode, followed by a Pre-launch review of the built product. Both modes recommend a top-tier reasoning model with high reasoning effort and prioritize verified sources over token savings.
 
 Choose [Standard or Budget-conscious CI](recipes/ci-strategy/README.md) during setup or later. Standard is the default. Both use local validation and require the same independent cloud checks before merge; Budget-conscious keeps agent PRs in draft until the user authorizes review, deferring expensive cloud jobs. The policy is provider-independent, with optional GitHub Actions examples.
@@ -45,6 +47,7 @@ For work that needs several PRs, deliver one at a time. Let the user review and 
 | `recipes/playwright-e2e/` | E2E CI decision guide and optional Playwright container workflow. |
 | `recipes/ci-strategy/` | Local validation policy, CI strategy selection and optional budget GitHub Actions examples. |
 | `recipes/legal-planning/` | Optional specification-based legal preparation and handoff to the external legal readiness skill. |
+| `recipes/scalability-planning/` | Lightweight capacity and cost planning, relevance assessment and handoff to the external scalability/cost skill. |
 | `BOOTSTRAP.md` | Prompt for applying the pack to a new repository. |
 
 More recipes can be added without making the core assume a framework or language. In particular, the Next.js ESLint config and Prettier preferences belong to its recipe, not to the core.

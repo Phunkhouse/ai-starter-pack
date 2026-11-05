@@ -11,12 +11,15 @@ The relevant recipe is <recipe name, or none>.
 The optional integrations are <integration recipe names, or none>.
 The CI strategy is <Standard (default) or Budget-conscious>.
 Legal planning is <enabled or omitted>.
+Scalability and cost planning is <offer (default), enabled or omitted>.
 
 Read the starter pack README.md, template/core/ and the selected recipes. Inspect the target repository and the documentation for the versions actually installed there.
 
 Read recipes/ci-strategy/README.md. Keep the project's CI provider and existing protections. Include its current triggers, required checks, available branch protections, local/cloud differences and any merge queue in the plan. Default to Standard when no strategy is specified. Record the selected strategy in AGENTS.md and adapt the existing CI without reducing pre-merge coverage. Prefer existing verification commands; add one unified command only when useful. Do not disable security, migration or deployment workflows to save validation minutes.
 
 First report a concise plan: the files you would copy or merge, package scripts and dependencies you would add, external integrations and repository secrets that need setup, checks you would run, and any conflicts or product choices that need my input. Wait for my approval before applying the plan.
+
+Follow recipes/scalability-planning/README.md. Unless explicitly omitted, assess relevance from the initial specification and offer lightweight scalability and cost planning in the initial plan. Explain the material cost drivers or why a simple static project needs little further analysis; do not launch an audit merely because it was offered. When enabled or accepted, use audit-scalability-cost in Planning mode before dependent infrastructure decisions. Keep estimates conditional on explicit workload assumptions, verify material provider prices/limits, and include CI/preview costs when relevant. Keep the report under docs/audits/ and promote approved decisions, monitoring and acceptance checks into SPEC.md and milestones separately. Reconcile estimates with an Audit after real usage data is available.
 
 When legal planning is enabled, follow recipes/legal-planning/README.md. After the initial specification and before feature implementation, invoke audit-legal-readiness in Planning mode with a top-tier reasoning model and high reasoning effort or the closest supported equivalent. Announce the known setup and warn if it is weaker or cannot be verified; prioritize thorough research over token savings. If the skill is unavailable, report the missing dependency rather than claiming the review ran. Keep its output under docs/audits/. Present the findings and material open questions before implementing dependent features; incorporate approved requirements into SPEC.md and milestone acceptance checks as a separate planning step. Plan a Pre-launch review against the actual product before release.
 
