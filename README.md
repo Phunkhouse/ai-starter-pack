@@ -36,6 +36,18 @@ Use a lowercase type followed by a colon, a space and a short imperative summary
 
 For work that needs several PRs, deliver one at a time. Let the user review and merge or close the current PR before starting the next implementation. Parallel PR work is an exception that the user must request explicitly.
 
+When a PR needs owner actions around merge or deployment, put them first in an `IMPORTANT` block and repeat them in the chat handoff. Give the responsible person, target environment, order, verified commands and success checks; distinguish merge from deployment and pending work from completed steps. Inspect schema, configuration and operational changes for these requirements. Omit the block when no action is needed.
+
+For example, replace these placeholders with verified project details and choose the timing from the actual deployment process:
+
+```markdown
+> [!IMPORTANT]
+> **Owner actions required**
+>
+> 1. **Before deployment — owner, production database:** run `<verified migration command>`. Confirm successful completion before deploying; stop if it fails.
+> 2. **After deployment — owner, worker machine:** run `<verified service restart command>`. Confirm the worker reconnects and completes a test job.
+```
+
 ## Layout
 
 | Location | Purpose |

@@ -57,6 +57,9 @@ Before changing code, inspect the relevant files and the installed framework's d
 
 ## Pull requests
 
+- Inspect schema, configuration and operational changes for owner actions such as database migrations, service restarts or steps on a separate machine. When actions are required, put a `> [!IMPORTANT]` block at the very top of the PR description and repeat the actions in the chat handoff. Omit the block when no action is needed.
+- List actions in execution order, naming the responsible person, target environment/machine, timing relative to merge or deployment, and how to verify success. Include the exact verified command (a one-liner for migrations when available); state unverified details explicitly rather than inventing commands. Identify failures that block the next step. Determine timing from deployment behavior and compatibility, not from an assumption that every migration runs before merge.
+- Keep the action block current as the PR changes and distinguish pending actions from confirmed completed steps. Documenting an action does not mean it has been performed or authorize executing it.
 - Work through multiple PRs sequentially. Keep at most one agent-authored PR awaiting user review at a time.
 - Finish checks and address feedback in the current PR. Wait for the user to merge or close it before starting the next PR's implementation, unless the user explicitly requests parallel PR work.
 - Leave the final merge to the user unless they explicitly ask you to perform it.
