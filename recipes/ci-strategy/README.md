@@ -23,6 +23,8 @@ Record `CI strategy: Standard` or `CI strategy: Budget-conscious` in the target 
 
 ## GitHub Actions configuration
 
+Runner location is independent of strategy: optionally use the [self-hosted Linux runner recipe](../self-hosted-runner/README.md) with either Standard or Budget-conscious CI. It includes an Oracle ARM example, manual GitHub-hosted fallback and a combined-job variant that preserves draft and required-check rules.
+
 The existing [Next.js CI](../next-fullstack/files/.github/workflows/ci.yml) and [optional Playwright container workflow](../playwright-e2e/files/.github/workflows/e2e.yml) implement Standard. Both use PR events, dependency caching and per-workflow/per-PR cancellation. They run again on `ready_for_review`, including when no new commit was pushed.
 
 For Budget-conscious, adapt the [single-job CI example](examples/budget-ci.yml) and, if applicable, the [E2E example](examples/budget-e2e.yml). Save them as the target project's existing `.github/workflows/ci.yml` and `e2e.yml` only after reconciling configuration, commands, services and required check names. The examples require the same project setup as their original recipes. Keep the Playwright image tag aligned with the installed package, or retain a verified runner-based browser setup.

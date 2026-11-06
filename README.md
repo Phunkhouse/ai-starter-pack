@@ -58,6 +58,7 @@ For example, replace these placeholders with verified project details and choose
 | `recipes/claude-pr-review/` | Optional GitHub workflow and setup guide for `@claude review` on pull requests. |
 | `recipes/playwright-e2e/` | E2E CI decision guide and optional Playwright container workflow. |
 | `recipes/ci-strategy/` | Local validation policy, CI strategy selection and optional budget GitHub Actions examples. |
+| `recipes/self-hosted-runner/` | Optional private-repository Linux CI runner, Oracle ARM setup and GitHub-hosted fallback for either CI strategy. |
 | `recipes/legal-planning/` | Optional specification-based legal preparation and handoff to the external legal readiness skill. |
 | `recipes/scalability-planning/` | Lightweight capacity and cost planning, relevance assessment and handoff to the external scalability/cost skill. |
 | `BOOTSTRAP.md` | Prompt for applying the pack to a new repository. |

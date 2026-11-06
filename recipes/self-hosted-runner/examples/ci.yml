@@ -1,0 +1,82 @@
+name: CI
+
+# Optional replacement for the project's CI/E2E workflows, not an extra suite.
+# Budget-conscious by default. See the recipe for Standard and required checks.
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review, converted_to_draft]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  check:
+    runs-on: ${{ vars.CI_RUNNER || 'ubuntu-24.04' }}
+    timeout-minutes: 40
+    services:
+      postgres:
+        # Services start BEFORE steps. An empty image avoids DB setup on drafts.
+        image: ${{ github.event.repository.private && (github.event_name != 'pull_request' || !github.event.pull_request.draft) && 'postgres:17' || '' }}
+        env:
+          POSTGRES_USER: ci
+          POSTGRES_PASSWORD: ci
+          POSTGRES_DB: ci
+        ports:
+          - 5432/tcp
+        options: >-
+          --health-cmd "pg_isready -U ci -d ci"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    env:
+      CI: 'true'
+    steps:
+      - name: Require a private repository
+        if: '!github.event.repository.private'
+        run: |
+          echo '::error::This persistent-runner recipe is for trusted private repositories only.'
+          exit 1
+      # Never skip the required job or report deferred validation as success.
+      - name: Require ready PR before cloud validation
+        if: github.event_name == 'pull_request' && github.event.pull_request.draft
+        run: |
+          echo '::error::Cloud validation deferred until the user authorizes ready for review.'
+          exit 1
+      - name: Record runner identity
+        env:
+          RUNNER_NAME: ${{ runner.name }}
+          RUNNER_ARCH: ${{ runner.arch }}
+          RUNNER_ENVIRONMENT: ${{ runner.environment }}
+          TOOL_CACHE: ${{ runner.tool_cache }}
+        run: |
+          printf 'runner_name=%s\narchitecture=%s\nenvironment=%s\ntool_cache=%s\n' \
+            "$RUNNER_NAME" "$RUNNER_ARCH" "$RUNNER_ENVIRONMENT" "$TOOL_CACHE"
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: pnpm/action-setup@v6
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+      - name: Configure disposable test database
+        env:
+          POSTGRES_PORT: ${{ job.services.postgres.ports['5432'] }}
+        run: echo "DATABASE_URL=postgresql://ci:ci@127.0.0.1:${POSTGRES_PORT}/ci" >> "$GITHUB_ENV"
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm format:check
+      - run: pnpm lint
+      - run: pnpm typecheck
+      # Required scripts: adapt to existing suites; integration owns test schema setup.
+      - run: pnpm test:unit
+      - run: pnpm test:integration
+      - run: pnpm build
+      - name: Install Chromium
+        run: pnpm exec playwright install chromium
+        timeout-minutes: 5
+      # playwright.config must start the already-built app, not build it again.
+      - run: pnpm exec playwright test --workers=1
