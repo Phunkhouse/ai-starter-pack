@@ -36,7 +36,8 @@ jobs:
   # Retain the Standard example's required check name: playwright.
   playwright:
     needs: [browser_tests]
-    if: always()
+    # Skip drafts; on ready/merge-group runs, check results even after failures.
+    if: always() && (github.event_name != 'pull_request' || !github.event.pull_request.draft)
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
@@ -45,6 +46,6 @@ jobs:
           RESULT: ${{ needs.browser_tests.result }}
         run: |
           if [ "$RESULT" != success ]; then
-            echo "::error::Browser validation did not succeed (result: $RESULT). Drafts defer cloud validation."
+            echo "::error::Browser validation did not succeed (result: $RESULT)."
             exit 1
           fi

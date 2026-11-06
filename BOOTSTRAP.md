@@ -27,6 +27,8 @@ After approval, adapt the applicable files without overwriting existing configur
 
 If the work needs multiple pull requests, deliver one at a time and wait for me to merge or close each PR before starting the next one. Do not open parallel PRs unless I explicitly ask for them.
 
+In Budget-conscious CI, skip draft validation jobs rather than failing them. Run the full suite on ready_for_review and every subsequent ready-state commit. Before any authorized merge, confirm the current revision's ready-state run actually executed and passed all mandatory suites; skipped checks do not prove validation.
+
 For PRs requiring owner actions such as migrations or remote-machine steps, put an IMPORTANT alert at the top of the PR description and repeat it in chat. List who acts, where, the order and timing relative to merge/deployment, verified commands and success checks. Keep pending and completed steps distinct; omit the alert when no action is needed.
 ```
 
