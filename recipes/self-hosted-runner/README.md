@@ -32,6 +32,14 @@ Choose a small paid ARM VM when predictable paid provisioning is preferable to w
 
 These are manual owner actions, not permission for an agent to create resources or change billing. Replace angle-bracket placeholders locally. Keep registration credentials out of chat, commits, screenshots and CI logs.
 
+### Adding another repository to an existing runner VM
+
+Skip account/VM creation (steps 1–2). Use `sudo ls /home/runner` to inspect existing folders; a folder alone does not prove registration. Reuse the dedicated user and install only missing project dependencies from steps 3 and 5. As `runner`, create a **new** `/home/runner/<folder>`; do not reconfigure another repository's folder or service.
+
+**Always repeat step 4 for the new repository:** open the **new repository's** Settings → Actions → Runners, register with **its URL/token**, and choose its own runner name and unique label. A repository-level runner registered to one repository never picks up another repository's jobs; a matching label does not register it. Organization runners with permitted repository access are a different setup ([runner scope](https://docs.github.com/en/actions/concepts/runners/self-hosted-runners), read **2026-11-06**). Install its separate service, check the shared-VM checklist below, and set `CI_RUNNER` only after the new runner shows **Idle in the new repository**.
+
+For either setup path, the adoption PR must put owner steps in an `> [!IMPORTANT]` block at the top and repeat them in chat, per the pack's PR rules. State whether to reuse a VM or create one, registration/dependency steps, the Idle-before-variable ordering, and a ready-run verification. Include who acts, where, timing and success checks; do not mark setup complete merely because the variable was saved.
+
 ### 1. Account, budget and access
 
 Create an individual account if appropriate for the owner; use accurate identity/contact details and a real billing address matching the payment card. Enable MFA. Oracle permits one free account per person and excludes virtual/single-use/prepaid cards and PIN debit cards; some debit cards functioning as credit cards are accepted ([Free Tier FAQ](https://www.oracle.com/cloud/free/faq/), read **2026-11-06**).
@@ -113,13 +121,13 @@ Use a Node version supported by that Playwright release; do not choose the last 
 
 ### 6. Set routing and housekeeping
 
-Set the repository **Actions variable** `CI_RUNNER` to the runner's unique custom label, not its display name. The example uses:
+**Only after the new runner shows Idle in this repository's Settings → Actions → Runners**, set its **Actions variable** `CI_RUNNER` to that runner's unique custom label, not its display name. An Idle runner listed only in a different repository is insufficient. The example uses:
 
 ```yaml
 runs-on: ${{ vars.CI_RUNNER || 'ubuntu-24.04' }}
 ```
 
-Only an **unset/empty variable** selects GitHub-hosted fallback. A configured offline runner leaves the job queued; it does not fall back automatically ([routing reference](https://docs.github.com/en/actions/reference/runners/self-hosted-runners), read **2026-11-06**). Clear the variable and start a new current-revision run to test fallback. Keep sensitive workflows explicitly GitHub-hosted and do not set this variable for all jobs indiscriminately.
+Only an **unset/empty variable** selects GitHub-hosted fallback. If no matching runner is online and idle, the job remains queued; it does not fall back automatically. After more than 24 hours queued, GitHub reports the job as **failed**, not a successful skip ([routing reference](https://docs.github.com/en/actions/reference/runners/self-hosted-runners), read **2026-11-06**). Register the missing runner or clear the variable and start a new current-revision run. Keep sensitive workflows explicitly GitHub-hosted.
 
 Monitor disk (`df -h`, `docker system df`), workspace/browser caches and runner logs. An optional weekly root cron entry for a **drained maintenance window** is:
 
@@ -135,6 +143,12 @@ Use one folder, registered runner name and custom label per repository, for exam
 
 Fixed host ports (PostgreSQL, Playwright/Next web servers) permit only one conflicting job per machine at a time, even across repositories. The example assigns a random database port, but a web server on port 3000 still conflicts. Keep one registration for a repository's label, use distinct web ports across simultaneously running repositories, or serialize all conflicting jobs. Per-PR concurrency only replaces runs of the **same PR**; it does not serialize other PRs or repositories. Folder separation does not fix port conflicts or provide security isolation.
 
+Before allowing overlap on a shared VM:
+
+- List each repository's fixed host ports (database services and web/E2E servers), confirm no overlap, and record assignments/serialization in each project's development docs. Dynamic container ports do not eliminate fixed web-server conflicts.
+- Watch memory and complete job time during the first overlapping runs; reduce concurrency if either workload becomes unstable or slower.
+- Confirm that all repositories are the owner's own trusted private projects. They share a machine with root-equivalent Docker access and are not isolated from one another.
+
 ## Adapt the combined workflow
 
 The [example](examples/ci.yml) is a **Budget-conscious combined-job alternative**, replacing the applicable existing CI/E2E jobs after review. Unlike the default separate-job recipe, it reuses one install, database service and production build for format → lint → typecheck → unit tests → integration tests → build → Playwright. It suits a small runner that executes jobs sequentially. Preserve every existing required suite; it is not permission to drop tests or browsers to fit ARM.
@@ -145,6 +159,27 @@ Adapt these contracts before installing it as `.github/workflows/ci.yml`:
 - PostgreSQL 17 is an example image, not a project requirement. Match the application's version and verify ARM64 support for all native dependencies, actions and container images; a GitHub-hosted x64 pass does not prove ARM compatibility. Dummy `ci` database credentials apply only to the disposable service.
 - Adapt the existing Playwright config to start the already-built app, such as `webServer.command: 'pnpm exec next start --hostname 127.0.0.1 --port 3000'`, with the matching URL and `reuseExistingServer: false` in CI. Do not rebuild in global setup or a `test:e2e` wrapper. Keep existing fixtures/migrations and important browser coverage; the Chromium-only install assumes the suite actually uses Chromium. Install every browser the suite requires.
 - Use low worker counts on the small VM. The example uses one Playwright worker and a 40-minute job timeout; set a smaller test-level timeout so the suite can finish reporting first. Tune Vitest workers using the installed version's supported options.
+
+For a project already using job-level draft skipping, keep that condition and its readiness triggers. Add runner routing, the identity step and a private-repository guard before checkout. In an existing private-project workflow that retains its hosted behavior, the guard can be scoped to `if: runner.environment == 'self-hosted' && !github.event.repository.private`; the supplied example remains private-only on either host. The pack's Budget-conscious default skips drafts. GitHub can count skipped required jobs as passing, so the current ready-state run must still actually validate the revision before merge.
+
+Keep any existing sudo-based tool installation **only** on `if: runner.environment == 'github-hosted'`. On self-hosted, check tools and fail with an owner action instead of attempting sudo. For example, before tests using `pg_dump`/`psql`, adapt the expected major to the project's server and verified client requirement:
+
+```yaml
+- name: Check owner-provisioned PostgreSQL client
+  if: runner.environment == 'self-hosted'
+  env:
+    PG_CLIENT_MAJOR: '17'
+  run: |
+    set -euo pipefail
+    for tool in pg_dump psql; do
+      if ! command -v "$tool" >/dev/null || ! "$tool" --version | grep -Eq " ${PG_CLIENT_MAJOR}([.]|$)"; then
+        echo "::error::Owner: install PostgreSQL ${PG_CLIENT_MAJOR} client (pg_dump and psql) once on this runner, then retry."
+        exit 1
+      fi
+    done
+```
+
+The hosted install must use the project's verified package/repository setup for that client version; do not assume the OS default matches the service. For existing caches of persistent local data such as `~/.cache/ms-playwright`, gate the cache action (or both separate restore/save steps) with `if: runner.environment == 'github-hosted'`. The VM keeps that data on disk; downloading missing browser binaries is still required. Preserve deliberate dependency-cache choices rather than disabling all caching. These are step-level conditions; `runner.environment` is unavailable in job-level `if` ([runner context](https://docs.github.com/en/actions/reference/workflows-and-actions/contexts#runner-context), read **2026-11-06**).
 
 Budget-conscious skips the entire job while the PR is a draft, so it allocates no runner or PostgreSQL service. Its conditional PostgreSQL image also stays empty for drafts. Returning to draft cancels an older run through per-PR concurrency; `ready_for_review` and every new ready commit run the full suite. A skipped draft status does not prove validation, even if GitHub accepts it for a required check: inspect the current revision's ready-state run before merge. No path filters or automatic merge/readiness changes are introduced.
 
@@ -164,11 +199,12 @@ Console issues below came from the supplied working setup; UI behavior and fraud
 - **`libatk-1.0.so.0` or other Chromium library missing:** provision the exact Playwright version's dependencies with the owner-run cache-Node command, verify the binary path, and rerun. Do not assume the distribution's Node package meets current tooling requirements. Recheck library/font compatibility after Playwright upgrades.
 - **Early database error in E2E:** a readiness probe before test database setup can emit an expected error in some projects. Confirm that the project's lifecycle explains it and all tests pass against the intended database. Do not dismiss unexplained errors merely because a later step is green.
 - **Queued/offline runner or canceled leftovers:** an offline configured label does not trigger fallback. After cancellation, inspect lingering app processes/ports and disk state before rerunning; do not kill other repositories' work blindly.
+- **Requested label but zero repository runners:** logs show `Requested labels: <label>` and `Waiting for a runner to pick up this job`, while this repository's runner list is empty. A variable alone does not register a runner, even if the VM serves another repository. Follow the existing-VM path and register for this repository, or clear `CI_RUNNER` and start a new run for hosted fallback. Do not wait for the 24-hour queue failure to fix registration.
 
 ## Acceptance checklist
 
 - [ ] Owner reviewed billing dates/sources, VM eligibility, aggregate allowances, a saved budget alert, SSH access and host/network isolation.
-- [ ] Registered runner shows **Idle**, its systemd service runs as `runner`, and it reconnects after a controlled reboot.
+- [ ] New runner shows **Idle in the target repository** before `CI_RUNNER` is set; its separate systemd service runs as `runner` and reconnects after a controlled reboot. Shared-VM ports and first-overlap memory/job time are checked.
 - [ ] A ready PR executes every mandatory suite. Check `runner_name`, architecture and environment in the job logs (or the job API's `runner_name`), not just the green badge; confirm the intended VM actually ran it.
 - [ ] Draft open/update/reopen skips the complete job in Budget-conscious mode, allocating no runner or PostgreSQL service; a skipped status is not validation evidence. Ready without a new commit starts full CI; the next commit requires its own successful result. Standard validates drafts fully.
 - [ ] A deliberate test failure blocks the combined required result. Cancellation/retry and any merge queue are checked with current-revision runs; required names match the actual protection settings.
