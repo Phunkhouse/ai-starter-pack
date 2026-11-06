@@ -15,6 +15,7 @@ concurrency:
 
 jobs:
   check:
+    if: github.event_name != 'pull_request' || !github.event.pull_request.draft
     runs-on: ${{ vars.CI_RUNNER || 'ubuntu-24.04' }}
     timeout-minutes: 40
     services:
@@ -39,12 +40,6 @@ jobs:
         if: '!github.event.repository.private'
         run: |
           echo '::error::This persistent-runner recipe is for trusted private repositories only.'
-          exit 1
-      # Never skip the required job or report deferred validation as success.
-      - name: Require ready PR before cloud validation
-        if: github.event_name == 'pull_request' && github.event.pull_request.draft
-        run: |
-          echo '::error::Cloud validation deferred until the user authorizes ready for review.'
           exit 1
       - name: Record runner identity
         env:

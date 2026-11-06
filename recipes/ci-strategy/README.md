@@ -7,7 +7,7 @@ Choose when validation runs without reducing what must pass before merge. This p
 | Strategy | During development | Before merge |
 | --- | --- | --- |
 | Standard (default) | Relevant local checks and automatic cloud CI on PR changes, including drafts. | All required cloud suites pass for the current revision. |
-| Budget-conscious (opt-in) | Agents create draft PRs and run relevant checks locally. Drafts defer expensive cloud jobs. Only explicit user permission allows the agent to mark a PR ready. | Ready for review triggers full CI. Every later commit to a ready PR triggers it again. The same required suites must pass. |
+| Budget-conscious (opt-in) | Agents create draft PRs and run relevant checks locally. Draft validation jobs are skipped until ready for review. Only explicit user permission allows the agent to mark a PR ready. | Ready for review triggers full CI. Every later commit to a ready PR triggers it again. The same required suites must pass. |
 
 Keep the existing one-PR-at-a-time cadence. Ready permission does not authorize merge; leave merging to the user unless explicitly authorized. Neither strategy permits bypassing checks or substituting local results for independent CI.
 
@@ -31,9 +31,9 @@ For Budget-conscious, adapt the [single-job CI example](examples/budget-ci.yml) 
 
 | PR event | Standard | Budget-conscious |
 | --- | --- | --- |
-| `opened`, `synchronize`, `reopened` | Full CI. | Full CI if ready; deferred if draft. |
+| `opened`, `synchronize`, `reopened` | Full CI. | Full CI if ready; jobs skipped if draft. |
 | `ready_for_review` | Full CI. | Full CI even without a new commit. |
-| `converted_to_draft` | No additional run; existing run may finish. | Cancels the previous run through concurrency; starts a deferred result. |
+| `converted_to_draft` | No additional run; existing run may finish. | Cancels the previous run through concurrency; new validation jobs are skipped. |
 
 Do not gate on the event action alone: a `synchronize` event can belong to either a draft or a ready PR. Use the PR's draft state. Do not replace `pull_request` with privileged `pull_request_target` to run PR code. Keep read-only workflow permissions and existing fork/secret restrictions; a fork approval or merge conflict can legitimately delay execution.
 
@@ -45,11 +45,11 @@ Cache dependencies using the lockfile and runtime/platform as appropriate. Keep 
 
 GitHub can accept a skipped required job as successful. A workflow skipped by path filters or skip instructions can instead leave checks pending. Therefore the examples do not use workflow-level path exclusions or commit-message skipping. A ready docs-only PR gets the full suite by default; a draft docs-only PR follows the draft policy. Introduce narrower suites only as a separately reviewed project decision with explicit coverage and required-result handling.
 
-The budget single-job example keeps `check` unconditional. On a draft it fails at the first step, before checkout or dependency installation. The multi-job E2E example skips `browser_tests` before runner/container allocation and always schedules the small `playwright` result job. That job accepts only `success`, rejecting `skipped`, `failure` and `cancelled`.
+Budget-conscious skips validation jobs at job level while the PR is a draft, so no validation runner, container or failure-only job is started. The `ready_for_review` event starts full validation even without a new commit; every later ready-state `synchronize` event runs it again. Draft status means validation has not run, not that tests failed.
 
-This deliberately leaves a red, deferred cloud check on drafts. A short runner job still consumes some minutes, but the expensive work is deferred. Draft PRs cannot merge. Do not turn this deferred result into a successful no-op.
+GitHub can accept a skipped job as satisfying a required check. Draft PRs cannot merge, but **a skipped draft check is not proof of testing**. Before merging, inspect the current revision's ready-state workflow run and actual suite results; a green summary alone is insufficient. Required checks alone cannot distinguish skipped validation from successful testing. If stronger automated enforcement is needed, use a separately verified merge-queue policy or project-specific protection that requires actual validation. This recipe does not provide that extra enforcement.
 
-For a larger multi-job workflow, use the same pattern: the final required job uses `if: always()`, lists every mandatory worker in `needs`, and explicitly checks that every result is `success`. Extend both the dependency list and result checks when adding a suite. Do not add a draft condition to the final job, use `continue-on-error` for mandatory workers, or treat any skipped mandatory suite as passing. Keep separate required outcomes for separate workflows; this example's `check` does not attest to E2E.
+For multi-job workflows, skip both workers and the final result job on drafts. On ready or merge-group events, the final job still runs after worker failures using `if: always() && (github.event_name != 'pull_request' || !github.event.pull_request.draft)`. List every mandatory worker in `needs` and require every result to be `success`; `skipped`, `failure` and `cancelled` on those validation runs must fail the final result. Extend both dependency and result checks when adding a suite. Do not use `continue-on-error` for mandatory workers. Keep separate required outcomes for separate workflows; this example's `check` does not attest to E2E.
 
 Configure branch protection or rulesets to require the actual final check names. The examples retain the original `check` and `playwright` names. In an existing project inspect the names GitHub reports, including matrix naming; use unique names and preserve any additional required security or deployment results. If renaming is necessary, generate the new result and coordinate the protection change before relying on it. Select GitHub Actions as the expected source when supported.
 
@@ -68,7 +68,7 @@ Check the target repository's plan and rules: GitHub branch protection and rules
 
 ## Retry and state changes
 
-Use GitHub's rerun action on the failed **ready-state run for the current revision**. A rerun retains its original event and SHA; it does not validate new commits or refresh a draft event into a ready event. Rerunning a draft-state run can remain deferred after the PR becomes ready. Use the new `ready_for_review` run instead.
+Use GitHub's rerun action on the failed **ready-state run for the current revision**. A rerun retains its original event and SHA; it does not validate new commits or refresh a draft event into a ready event. Rerunning a draft-state run can remain skipped after the PR becomes ready. Use the new `ready_for_review` run instead.
 
 A new commit to a ready PR must obtain new successful checks. An older green run is insufficient. If the PR needs more development, the user can return it to draft. A stale rerun may still show a result based on its original state; verify the PR's current revision and readiness before any authorized merge. Do not repeatedly rerun failures without investigating their cause.
 
@@ -87,12 +87,12 @@ Static YAML validation checks syntax and expressions; it cannot prove GitHub eve
 
 | Scenario | Expected result |
 | --- | --- |
-| Open, update and reopen a draft | Standard runs all suites; budget defers expensive jobs and does not produce a successful final result. |
+| Open, update and reopen a draft | Standard runs all suites; budget validation jobs (including final results) are skipped without allocating runners/services. |
 | Mark draft ready without a new commit | All suites run and required results pass only after real success. |
 | Push after green ready CI | New revision runs all suites and cannot merge using only the previous revision's result. |
-| Return a running ready PR to draft | Budget cancels the older run; expensive new jobs do not start. Deferred result is not green. |
+| Return a running ready PR to draft | Budget cancels the older run; new validation jobs are skipped. Do not count their status as testing evidence. |
 | Fail, cancel or time out a mandatory worker | Required final result does not pass, including in multi-job CI. |
-| Skip a mandatory worker | Required final result fails; the skipped worker cannot satisfy the final result. |
+| Skip a mandatory worker in a ready/merge-group run | Required final result fails; the skipped worker cannot satisfy the final result. |
 | Rerun failed current ready CI | Uses the same revision and reruns validation; a stale revision or draft run does not substitute for the current ready run. |
 | Change only documentation | Ready PR still runs the full configured suite, with no indefinitely pending path-filtered check. |
 | Push rapidly to two PRs | Obsolete runs of each workflow/PR are canceled; different PRs and CI/E2E do not cancel each other. |
@@ -100,7 +100,7 @@ Static YAML validation checks syntax and expressions; it cannot prove GitHub eve
 | Try merging with a failed/missing current check | Branch protection/ruleset blocks it for actors without bypass rights. |
 | Switch each direction with open PRs | Instructions and workflows agree; current PR revisions receive the intended checks. |
 
-Measure draft and ready runs, including the short result jobs and cold cache cases. Confirm that the savings come from scheduling and setup, with the same pre-merge test coverage.
+Measure draft and ready runs, including confirmation that draft jobs allocate no runners and ready runs cover cold cache cases. Confirm that the savings come from scheduling and setup, with the same pre-merge test coverage.
 
 ## References
 

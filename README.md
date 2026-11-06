@@ -22,7 +22,7 @@ At setup, offer [lightweight scalability and cost planning](recipes/scalability-
 
 Optionally enable [legal planning](recipes/legal-planning/README.md) after the first specification and before feature implementation. It uses the external `audit-legal-readiness` skill in Planning mode, followed by a Pre-launch review of the built product. Both modes recommend a top-tier reasoning model with high reasoning effort and prioritize verified sources over token savings.
 
-Choose [Standard or Budget-conscious CI](recipes/ci-strategy/README.md) during setup or later. Standard is the default. Both use local validation and require the same independent cloud checks before merge; Budget-conscious keeps agent PRs in draft until the user authorizes review, deferring expensive cloud jobs. The policy is provider-independent, with optional GitHub Actions examples.
+Choose [Standard or Budget-conscious CI](recipes/ci-strategy/README.md) during setup or later. Standard is the default. Both use local validation and require the same independent cloud checks before merge; Budget-conscious skips draft PR jobs until the user authorizes ready for review. Inspect actual ready-state suite results before merging; a skipped draft check is not validation evidence. The policy is provider-independent, with optional GitHub Actions examples.
 
 When development stages are agreed, copy the optional [milestone template](template/optional/docs/MILESTONES.md) into the target project's `docs/` directory and replace its prompts with the actual plan. Each milestone should have observable acceptance checks, a way to verify them and completion evidence. A milestone can span multiple PRs, which still follow the one-at-a-time review cadence.
 
