@@ -2,6 +2,8 @@
 
 Choose when validation runs without reducing what must pass before merge. This policy works with any CI provider; the optional examples below use GitHub Actions and the existing Next.js/pnpm and Playwright recipes. They are adaptations, not additional workflows to install alongside existing ones.
 
+For an existing setup with slow feedback, costly execution or recurring failures, optionally use [Test and CI efficiency review](../test-ci-review/README.md) before choosing optimizations. It invokes the external audit skill without switching strategy or changing workflows; implementation remains a separate task.
+
 ## Choose a strategy
 
 | Strategy | During development | Before merge |
