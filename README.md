@@ -24,6 +24,8 @@ Optionally enable [legal planning](recipes/legal-planning/README.md) after the f
 
 Choose [Standard or Budget-conscious CI](recipes/ci-strategy/README.md) during setup or later. Standard is the default. Both use local validation and require the same independent cloud checks before merge; Budget-conscious skips draft PR jobs until the user authorizes ready for review. Inspect actual ready-state suite results before merging; a skipped draft check is not validation evidence. The policy is provider-independent, with optional GitHub Actions examples.
 
+Optionally use [Test and CI efficiency review](recipes/test-ci-review/README.md) once real tests/CI exist, especially when feedback is slow, compute or maintenance is costly, failures recur or runner changes are being considered. It invokes the external `audit-test-ci` skill for an evidence-based report before a separate implementation task. It preserves meaningful coverage and required gates, can recommend keeping the setup, and is not a mandatory bootstrap audit or a CI strategy switch.
+
 When development stages are agreed, copy the optional [milestone template](template/optional/docs/MILESTONES.md) into the target project's `docs/` directory and replace its prompts with the actual plan. Each milestone should have observable acceptance checks, a way to verify them and completion evidence. A milestone can span multiple PRs, which still follow the one-at-a-time review cadence.
 
 When applying the pack to an existing repository, reconcile any earlier project brief or specification with `docs/SPEC.md` so the project does not keep competing sources of truth.
@@ -58,6 +60,7 @@ For example, replace these placeholders with verified project details and choose
 | `recipes/claude-pr-review/` | Optional GitHub workflow and setup guide for `@claude review` on pull requests. |
 | `recipes/playwright-e2e/` | E2E CI decision guide and optional Playwright container workflow. |
 | `recipes/ci-strategy/` | Local validation policy, CI strategy selection and optional budget GitHub Actions examples. |
+| `recipes/test-ci-review/` | Optional evidence-based test/CI efficiency review and handoff to the external audit skill before implementation. |
 | `recipes/self-hosted-runner/` | Optional private-repository Linux CI runner, Oracle ARM setup and GitHub-hosted fallback for either CI strategy. |
 | `recipes/legal-planning/` | Optional specification-based legal preparation and handoff to the external legal readiness skill. |
 | `recipes/scalability-planning/` | Lightweight capacity and cost planning, relevance assessment and handoff to the external scalability/cost skill. |

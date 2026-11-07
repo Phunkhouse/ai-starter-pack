@@ -2,6 +2,8 @@
 
 Guidance for keeping Playwright end-to-end tests reliable without making CI setup unnecessarily slow. The included workflow is an **optional container variant**, not a default replacement for a fast, verified runner-based job. Measure the complete E2E job, including dependency setup, browser setup, services and tests, before changing its environment.
 
+Use the optional [Test and CI efficiency review](../test-ci-review/README.md) when diagnosis needs to cover test layers, fixtures, suite boundaries, required gates and the wider pipeline. The external audit reports evidence and recommendations before any separate implementation; it does not automatically select this container recipe.
+
 ## Choose the CI environment
 
 The included workflow uses Standard CI. Apply the [CI strategy recipe](../ci-strategy/README.md) if choosing Budget-conscious CI. Gate the container job before it starts, so a draft does not pull the browser image. The budget example retains a required result that fails when browser tests were skipped; successful main CI alone does not establish E2E success. Replace or adapt the existing workflow rather than installing both variants.
