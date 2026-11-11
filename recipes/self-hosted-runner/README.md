@@ -2,7 +2,7 @@
 
 An optional, owner-managed Linux runner for trusted private repositories that exhaust their included GitHub Actions compute. Oracle Cloud Always Free ARM is the primary example; a paid Linux VM or a dedicated home machine works too. Runner location is independent of the [Standard or Budget-conscious strategy](../ci-strategy/README.md): choose when validation runs separately from where it runs. Required validation and user control over readiness/merge stay unchanged.
 
-The owner's source project reportedly passed its combined Next.js/pnpm, Vitest, PostgreSQL and Playwright job in about 4.5 minutes on an Oracle ARM VM. That is supplied experience, not a benchmark reproduced by this pack. This recipe provisions nothing automatically.
+For execution improvements after runner adoption, use [CI execution performance](../ci-performance/README.md) with either CI strategy. Its [Kultomat case study](../ci-performance/case-study.md) records source-verified job/step timings and attribution limits. Results depend on the project and run conditions. This recipe provisions nothing automatically.
 
 ## Suitability and security
 
