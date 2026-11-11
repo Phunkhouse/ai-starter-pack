@@ -4,6 +4,8 @@ Choose when validation runs without reducing what must pass before merge. This p
 
 For an existing setup with slow feedback, costly execution or recurring failures, optionally use [Test and CI efficiency review](../test-ci-review/README.md) before choosing optimizations. It invokes the external audit skill without switching strategy or changing workflows; implementation remains a separate task.
 
+Use [CI execution performance](../ci-performance/README.md) for targeted execution improvements under **either** strategy. Worker tuning, safe caches and avoiding duplicate work do not require deferring draft checks or changing required coverage. Hosted versus persistent-runner handling is a separate choice.
+
 ## Choose a strategy
 
 | Strategy | During development | Before merge |

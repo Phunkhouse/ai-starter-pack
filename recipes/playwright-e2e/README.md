@@ -4,6 +4,8 @@ Guidance for keeping Playwright end-to-end tests reliable without making CI setu
 
 Use the optional [Test and CI efficiency review](../test-ci-review/README.md) when diagnosis needs to cover test layers, fixtures, suite boundaries, required gates and the wider pipeline. The external audit reports evidence and recommendations before any separate implementation; it does not automatically select this container recipe.
 
+For targeted worker/setup/cache improvements with either CI strategy, follow [CI execution performance](../ci-performance/README.md). Inspect actual workers and resources, preserve serial cases and isolated state, and compare complete E2E phases rather than assuming more workers or a container will help.
+
 ## Choose the CI environment
 
 The included workflow uses Standard CI. Apply the [CI strategy recipe](../ci-strategy/README.md) if choosing Budget-conscious CI. Gate the container job before it starts, so a draft does not pull the browser image. The budget example retains a required result that fails when browser tests were skipped; successful main CI alone does not establish E2E success. Replace or adapt the existing workflow rather than installing both variants.

@@ -26,6 +26,8 @@ Choose [Standard or Budget-conscious CI](recipes/ci-strategy/README.md) during s
 
 Optionally use [Test and CI efficiency review](recipes/test-ci-review/README.md) once real tests/CI exist, especially when feedback is slow, compute or maintenance is costly, failures recur or runner changes are being considered. It invokes the external `audit-test-ci` skill for an evidence-based report before a separate implementation task. It preserves meaningful coverage and required gates, can recommend keeping the setup, and is not a mandatory bootstrap audit or a CI strategy switch.
 
+Use [CI execution performance](recipes/ci-performance/README.md) for bounded improvements under either Standard or Budget-conscious CI: actual worker/resource checks, compatible caches, repeated setup/build work and preserved validation. It distinguishes hosted from persistent-runner conditions without changing scheduling policy. The [Kultomat case study](recipes/ci-performance/case-study.md) records verified CI job/step timings and their attribution limits; it is not a default configuration or a savings promise.
+
 When development stages are agreed, copy the optional [milestone template](template/optional/docs/MILESTONES.md) into the target project's `docs/` directory and replace its prompts with the actual plan. Each milestone should have observable acceptance checks, a way to verify them and completion evidence. A milestone can span multiple PRs, which still follow the one-at-a-time review cadence.
 
 When applying the pack to an existing repository, reconcile any earlier project brief or specification with `docs/SPEC.md` so the project does not keep competing sources of truth.
@@ -61,6 +63,7 @@ For example, replace these placeholders with verified project details and choose
 | `recipes/playwright-e2e/` | E2E CI decision guide and optional Playwright container workflow. |
 | `recipes/ci-strategy/` | Local validation policy, CI strategy selection and optional budget GitHub Actions examples. |
 | `recipes/test-ci-review/` | Optional evidence-based test/CI efficiency review and handoff to the external audit skill before implementation. |
+| `recipes/ci-performance/` | Shared execution-performance guidance for either CI strategy, runner-specific conditions and a scoped Kultomat case study. |
 | `recipes/self-hosted-runner/` | Optional private-repository Linux CI runner, Oracle ARM setup and GitHub-hosted fallback for either CI strategy. |
 | `recipes/legal-planning/` | Optional specification-based legal preparation and handoff to the external legal readiness skill. |
 | `recipes/scalability-planning/` | Lightweight capacity and cost planning, relevance assessment and handoff to the external scalability/cost skill. |

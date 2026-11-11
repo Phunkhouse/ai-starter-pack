@@ -50,6 +50,7 @@ Choose implementation candidates only when their conditions fit:
 
 | Existing recipe | Use after the audit establishes |
 | --- | --- |
+| [CI execution performance](../ci-performance/README.md) | A bounded worker/cache/setup change is justified under the existing strategy, with measurable acceptance checks and retained coverage. |
 | [CI strategy](../ci-strategy/README.md) | Scheduling or local/cloud validation changes would help while retaining the required pre-merge coverage. Standard remains the default; Budget-conscious requires the user's choice. |
 | [Playwright E2E](../playwright-e2e/README.md) | The project actually uses Playwright and measured environment/setup tradeoffs justify adapting its runner, container or caching approach. |
 | [Self-hosted runner](../self-hosted-runner/README.md) | Overall benefit justifies operating the host, compatibility is verified and the code/trust boundaries meet the recipe's conditions. Neither ARM nor a migration is automatic. |
