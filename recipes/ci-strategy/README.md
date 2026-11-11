@@ -27,6 +27,8 @@ Record `CI strategy: Standard` or `CI strategy: Budget-conscious` in the target 
 
 ## GitHub Actions configuration
 
+For Vercel-hosted projects, also offer the optional [deployment-budget recipe](../vercel-deployment-budget/README.md): after a preview-dependency review and user agreement, limit automatic Git deployments to production and an opt-in preview namespace. Draft CI skipping and self-hosted runners do not control Vercel preview creation. Keep production and independent CI verification intact.
+
 Runner location is independent of strategy: optionally use the [self-hosted Linux runner recipe](../self-hosted-runner/README.md) with either Standard or Budget-conscious CI. It includes an Oracle ARM example, manual GitHub-hosted fallback and a combined-job variant that preserves draft and required-check rules.
 
 The existing [Next.js CI](../next-fullstack/files/.github/workflows/ci.yml) and [optional Playwright container workflow](../playwright-e2e/files/.github/workflows/e2e.yml) implement Standard. Both use PR events, dependency caching and per-workflow/per-PR cancellation. They run again on `ready_for_review`, including when no new commit was pushed.

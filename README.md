@@ -62,6 +62,7 @@ For example, replace these placeholders with verified project details and choose
 | `recipes/claude-pr-review/` | Optional GitHub workflow and setup guide for `@claude review` on pull requests. |
 | `recipes/playwright-e2e/` | E2E CI decision guide and optional Playwright container workflow. |
 | `recipes/ci-strategy/` | Local validation policy, CI strategy selection and optional budget GitHub Actions examples. |
+| `recipes/vercel-deployment-budget/` | Optional production/opt-in-preview Git deployment policy after reviewing Vercel dependencies and obtaining user agreement. |
 | `recipes/test-ci-review/` | Optional evidence-based test/CI efficiency review and handoff to the external audit skill before implementation. |
 | `recipes/ci-performance/` | Shared execution-performance guidance for either CI strategy, runner-specific conditions and a scoped Kultomat case study. |
 | `recipes/self-hosted-runner/` | Optional private-repository Linux CI runner, Oracle ARM setup and GitHub-hosted fallback for either CI strategy. |
