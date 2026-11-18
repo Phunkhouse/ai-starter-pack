@@ -39,13 +39,21 @@ For Budget-conscious, adapt the [single-job CI example](examples/budget-ci.yml) 
 | --- | --- | --- |
 | `opened`, `synchronize`, `reopened` | Full CI. | Full CI if ready; jobs skipped if draft. |
 | `ready_for_review` | Full CI. | Full CI even without a new commit. |
-| `converted_to_draft` | No additional run; existing run may finish. | Cancels the previous run through concurrency; new validation jobs are skipped. |
+| `converted_to_draft` | No additional run; existing run may finish. | New validation jobs are skipped; an existing ready run may finish. |
 
 Do not gate on the event action alone: a `synchronize` event can belong to either a draft or a ready PR. Use the PR's draft state. Do not replace `pull_request` with privileged `pull_request_target` to run PR code. Keep read-only workflow permissions and existing fork/secret restrictions; a fork approval or merge conflict can legitimately delay execution.
 
 Avoid duplicate PR and branch-push validation. Preserve post-merge, security, migration and deployment workflows that serve different purposes. Cancellation is appropriate for replaceable validation; do not apply it to migrations or deployments without evaluating partial execution and rollback.
 
 Cache dependencies using the lockfile and runtime/platform as appropriate. Keep lockfile-based installs. Do not share secrets through caches or assume cached build/test results establish validation. Add browser or build caches only after measuring complete job times; see the [Playwright guide](../playwright-e2e/README.md).
+
+### Draft and validation concurrency
+
+Budget examples separate concurrency groups by workflow, PR/ref and whether the event skips validation as a draft. A delayed `synchronize` event can still carry draft state after `ready_for_review` has started real validation. With a shared group, that skipped run can cancel running validation or replace pending validation. Use the same draft-state decision as the job gates; splitting only by event action would also separate ready pushes from ready-for-review runs. Conditional `cancel-in-progress` alone does not prevent pending replacement.
+
+The `draft`/`validate` suffix prevents this cross-group cancellation. Ready runs still supersede earlier validation in the same workflow/PR group. Returning to draft skips new jobs but deliberately leaves an existing ready run alone; this recipe does not automatically cancel it. Any stronger cancellation policy needs separate review of delayed events and the current PR state/revision. Avoid adding cancellation tokens or API steps just to recover that optional saving.
+
+GitHub does not guarantee dispatch-order execution. Group separation does not prevent an older validation event from arriving later within the validation group, and does not prove that a green check validates the current revision. Keep the actual-run checks below. Other event types such as `merge_group` use the validation bucket and their own ref. Standard examples run drafts too and retain one workflow/PR group without the draft suffix.
 
 ## Required checks must represent real validation
 
@@ -96,7 +104,9 @@ Static YAML validation checks syntax and expressions; it cannot prove GitHub eve
 | Open, update and reopen a draft | Standard runs all suites; budget validation jobs (including final results) are skipped without allocating runners/services. |
 | Mark draft ready without a new commit | All suites run and required results pass only after real success. |
 | Push after green ready CI | New revision runs all suites and cannot merge using only the previous revision's result. |
-| Return a running ready PR to draft | Budget cancels the older run; new validation jobs are skipped. Do not count their status as testing evidence. |
+| Push on a draft, then immediately mark ready; inspect a delayed draft event | Budget's skipped draft run cannot cancel running validation or replace pending validation in the ready group; full validation still executes. |
+| Return a running ready PR to draft | Budget skips new validation jobs; the existing ready run may finish. Do not count the skipped status as testing evidence. |
+| Change ready → draft → ready rapidly without a new commit | The final ready event requests full validation; intervening draft events cannot cancel it. Inspect actual ready-state results for the current revision. |
 | Fail, cancel or time out a mandatory worker | Required final result does not pass, including in multi-job CI. |
 | Skip a mandatory worker in a ready/merge-group run | Required final result fails; the skipped worker cannot satisfy the final result. |
 | Rerun failed current ready CI | Uses the same revision and reruns validation; a stale revision or draft run does not substitute for the current ready run. |
