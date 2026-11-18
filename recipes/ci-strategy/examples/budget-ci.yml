@@ -8,7 +8,8 @@ permissions:
   contents: read
 
 concurrency:
-  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  # Delayed draft events must not cancel or replace required validation.
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}-${{ github.event_name == 'pull_request' && github.event.pull_request.draft && 'draft' || 'validate' }}
   cancel-in-progress: true
 
 jobs:
