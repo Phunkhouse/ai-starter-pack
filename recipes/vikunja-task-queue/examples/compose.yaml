@@ -1,0 +1,57 @@
+name: vikunja-queue
+
+services:
+  vikunja:
+    # Owner supplies a reviewed version tag AND digest, never latest.
+    image: ${VIKUNJA_IMAGE:?Set vikunja/vikunja version and sha256 digest}
+    user: "${VIKUNJA_UID:?Set dedicated host UID}:${VIKUNJA_GID:?Set dedicated host GID}"
+    restart: unless-stopped
+    read_only: true
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    mem_limit: 384m
+    tmpfs: ["/tmp:rw,nosuid,nodev,noexec,size=64m"]
+    environment:
+      VIKUNJA_SERVICE_PUBLICURL: https://tasks.example.com/
+      VIKUNJA_SERVICE_SECRET: ${VIKUNJA_SERVICE_SECRET:?Set a stable random secret}
+      VIKUNJA_SERVICE_ENABLEREGISTRATION: "false"
+      VIKUNJA_SERVICE_IPEXTRACTIONMETHOD: xff
+      VIKUNJA_SERVICE_TRUSTEDPROXIES: ${APP_SUBNET:?Set a dedicated non-overlapping CIDR}
+      VIKUNJA_DATABASE_TYPE: sqlite
+      VIKUNJA_DATABASE_PATH: /db/vikunja.db
+      VIKUNJA_FILES_BASEPATH: /app/vikunja/files
+      VIKUNJA_REDIS_ENABLED: "false"
+      VIKUNJA_MAILER_ENABLED: "false"
+    volumes:
+      - ./data/db:/db
+      - ./data/files:/app/vikunja/files
+    healthcheck:
+      test: [CMD, /app/vikunja/vikunja, healthcheck]
+      interval: 30s
+      timeout: 10s
+      start_period: 30s
+      retries: 3
+    networks: [app]
+    # No ports: the only ingress is the tunnel through Access.
+
+  cloudflared:
+    image: ${CLOUDFLARED_IMAGE:?Set cloudflare/cloudflared version and sha256 digest}
+    restart: unless-stopped
+    read_only: true
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    command: [tunnel, --no-autoupdate, run]
+    environment:
+      TUNNEL_TOKEN: ${TUNNEL_TOKEN:?Set the tunnel connector token privately}
+    depends_on:
+      vikunja:
+        condition: service_healthy
+    networks: [app, egress]
+
+networks:
+  app:
+    internal: true
+    ipam:
+      config:
+        - subnet: ${APP_SUBNET:?Set a dedicated non-overlapping CIDR}
+  egress: {}

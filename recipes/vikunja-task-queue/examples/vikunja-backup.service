@@ -1,0 +1,14 @@
+[Unit]
+Description=Vikunja stopped-copy encrypted backup
+Wants=network-online.target
+After=network-online.target docker.service
+Requires=docker.service
+
+[Service]
+Type=oneshot
+User=root
+EnvironmentFile=/etc/vikunja-backup.env
+ExecStart=/usr/local/sbin/vikunja-backup
+UMask=0077
+TimeoutStartSec=30min
+# Docker access is root-equivalent. Install only owner-reviewed, root-owned files.

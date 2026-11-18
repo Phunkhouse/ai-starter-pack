@@ -1,0 +1,33 @@
+# Merge into the owner's user config; no credentials belong in TOML.
+[mcp_servers.vikunja]
+url = "https://tasks.example.com/api/v2/mcp"
+bearer_token_env_var = "VIKUNJA_MCP_TOKEN"
+env_http_headers = { "CF-Access-Client-Id" = "CF_ACCESS_CLIENT_ID", "CF-Access-Client-Secret" = "CF_ACCESS_CLIENT_SECRET" }
+default_tools_approval_mode = "prompt"
+enabled_tools = ["projects_list", "projects_read", "tasks_list", "tasks_read", "tasks_create", "tasks_update", "task_comments_list", "task_comments_read", "task_comments_create", "labels_list", "labels_read", "task_assignees_list", "task_assignees_create", "users_search", "filter_syntax", "find_action", "do_action"]
+
+[mcp_servers.vikunja.tools.projects_list]
+approval_mode = "approve"
+[mcp_servers.vikunja.tools.projects_read]
+approval_mode = "approve"
+[mcp_servers.vikunja.tools.tasks_list]
+approval_mode = "approve"
+[mcp_servers.vikunja.tools.tasks_read]
+approval_mode = "approve"
+[mcp_servers.vikunja.tools.task_comments_list]
+approval_mode = "approve"
+[mcp_servers.vikunja.tools.task_comments_read]
+approval_mode = "approve"
+[mcp_servers.vikunja.tools.labels_list]
+approval_mode = "approve"
+[mcp_servers.vikunja.tools.labels_read]
+approval_mode = "approve"
+[mcp_servers.vikunja.tools.task_assignees_list]
+approval_mode = "approve"
+[mcp_servers.vikunja.tools.users_search]
+approval_mode = "approve"
+[mcp_servers.vikunja.tools.filter_syntax]
+approval_mode = "approve"
+[mcp_servers.vikunja.tools.find_action]
+approval_mode = "approve"
+# do_action can dispatch writes: never grant it a blanket read approval.
