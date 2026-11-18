@@ -71,6 +71,38 @@ The helper prints JSON string headers to stdout for the client only. Check `/mcp
 
 **Codex:** merge [codex-config.toml](examples/codex-config.toml) into the owner's `~/.codex/config.toml`. Use [codex-with-vikunja.sh](examples/codex-with-vikunja.sh) as a separately named launcher, not a globally exported shell environment. It reads the Codex-specific Keychain items and supplies the three environment variables only to that invocation. A desktop launch does not inherit this wrapper automatically. The example restricts tools, defaults to `prompt`, and uses per-tool `approval_mode = "approve"` for inspected reads. `do_action` stays prompted, including catalog reads. The v2.8.0 server does not attach read-only annotations to these tools, so do not rely on `writes` mode to classify them; verify actual prompts in the installed client. Policy cannot override enterprise controls or a task's need for owner authorization. [Official Codex configuration reference](https://learn.chatgpt.com/docs/config-file/config-reference) (read 2026-11-18).
 
+## Lifecycle skill and reminder hook (optional)
+
+[skills/task-sync/SKILL.md](skills/task-sync/SKILL.md) keeps a task in step with the work: **start** (one read with comments and column, then claim at the first real change), **checkpoint**, **pr**, **review**, **ci**, **close** (Done per the project's Done policy), **capture** (propose, create on the owner's yes) and **reconcile** (one `tasks_list` per project filtered on the In Progress and Review buckets, then `gh pr view` per linked PR). Each agent keeps one `**Agent status**` comment per task and edits it in place. Project values come from the project's AGENTS.md section, so the skill holds none. It uses about ten Vikunja calls per task.
+
+Install it like other shared Skills, as links from a local clone of this repository: `ln -s <CLONE>/recipes/vikunja-task-queue/skills/task-sync ~/.claude/skills/task-sync` (Claude Code) and the same into `~/.agents/skills/` (Codex). Start a new session to load it.
+
+Nothing runs while no agent is running. Merges are noticed by the next **reconcile** ("sync the board"); a GitHub Action posting merge comments would need a comment-only bot, its tokens as Actions secrets and hosted-runner minutes, and it should never move tasks.
+
+When Vikunja is unreachable, the skill appends intended updates to `~/.local/state/task-sync/outbox.md` (no secrets) and the next reconcile applies them. Column state can always be derived again from GitHub.
+
+**Claude Code reminder hook:** [task-sync-reminder.sh](examples/task-sync-reminder.sh) runs after `gh pr create` and `gh pr ready`. When the branch's PR body has a `Task:` line, it tells the agent that the task-sync `pr` or `review` step has not run. It makes no Vikunja call and exits silently on any failure. It needs `jq`, `gh` and `timeout`. Copy it to `~/.claude/hooks/` with mode 755 and add to `~/.claude/settings.json`:
+
+```json
+{
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          { "type": "command", "if": "Bash(gh pr create *)", "command": "~/.claude/hooks/task-sync-reminder.sh" },
+          { "type": "command", "if": "Bash(gh pr ready *)", "command": "~/.claude/hooks/task-sync-reminder.sh" }
+        ]
+      }
+    ]
+  }
+}
+```
+
+The `if` filter is best-effort per the [hooks reference](https://code.claude.com/docs/en/hooks) (read 2026-11-18). That's fine for a reminder, but not for enforcement.
+
+**Prompts:** keeping the board current without the owner approving each write means allowing the Vikunja tools in the client (`"allow": ["mcp__vikunja__*"]` in Claude Code), `do_action` included. Do this only when the bot's token is narrow (no deletes, no project or label administration), because the token is then the real limit. Otherwise keep `do_action` prompted, as above.
+
 ## Backups and restore drill
 
 SQLite uses WAL. Never copy just `vikunja.db` from a running app: freeze the writer and copy the whole DB directory, WAL/SHM if present, and uploads as one consistent set. [Database source](https://github.com/go-vikunja/vikunja/blob/v2.8.0/pkg/db/db.go) (read 2026-11-18). Outage is copy duration, not a promised one second.
