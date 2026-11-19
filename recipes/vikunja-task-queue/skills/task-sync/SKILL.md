@@ -38,7 +38,7 @@ Never edit the task description, priority, due date or labels of a task you are 
 
 1. Read it in one call: `do_action` `tasks_read_by_index` `{"project": "<IDENTIFIER>", "index": <n>, "expand": ["comments", "buckets"], "format": "markdown"}` (for a URL, `tasks_read` with the numeric id and the same `expand`). `buckets[].title` is its column. Read linked PRs or issues with `gh`.
 2. If it is assigned to someone else, or In Progress with another agent's status comment, stop and ask.
-3. Plan and investigate without changing the board. **At the first real change** (first edit, branch or migration), claim it: `task_assignees_create` (yourself), `task_bucket_update` to In Progress, then create the status comment with the plan. Read back the column once. On 412 (column full), report which tasks hold it; do not force or move other tasks.
+3. Plan and investigate without changing the board. **At the first real change** (first edit, branch or migration), claim it: re-read the task's assignees and column (`fields`) and stop as in step 2 if they changed, then `task_assignees_create` (yourself), `task_bucket_update` to In Progress, then create the status comment with the plan. Read back the column once. On 412 (column full), report which tasks hold it; do not force or move other tasks.
 
 ### checkpoint — progress, pause, blocker or handoff
 
@@ -69,14 +69,14 @@ Propose it in the final message as a short numbered list ("Capture to Inbox? 1) 
 
 ### reconcile — "sync the board", or at the start of a session that continues task work
 
-1. Apply the outbox (below) first; clear each applied line.
+1. Apply your own outbox (below) first; clear each applied line. Never apply another bot's outbox.
 2. One call per project: `tasks_list` `{"filter": "project = <id> && bucket_id in <In Progress>, <Review>", "fields": ["id", "identifier", "title"], "expand": ["comments"], "format": "markdown"}`.
 3. For each task with a PR in its status comment, `gh pr view` it. Merged: run **close**. Closed without merge: report it. Still open: leave it.
 4. Report in one short list what changed and what needs the owner. Do not touch tasks of other agents beyond reporting.
 
 ## When Vikunja is unavailable
 
-Never stop or delay the work for Vikunja. If a call fails (no MCP tools, 401, 403, 5xx, a 302 to a login page, timeout), retry once at most, then append one line per intended update to `~/.local/state/task-sync/outbox.md` (create the folder if needed):
+Never stop or delay the work for Vikunja. If a call fails (no MCP tools, 401, 403, 5xx, a 302 to a login page, timeout), retry once at most, then append one line per intended update to `~/.local/state/task-sync/outbox-<bot user>.md`, one file per bot identity so agents on the same machine never apply each other's updates (create the folder if needed):
 
 ```
 <UTC time> | <IDENTIFIER-n> | <action: claim | move:<column> | status | capture> | <text or field values> | <reason>
@@ -86,4 +86,4 @@ Name the pending updates in the final message. Column state can always be derive
 
 ## Call budget
 
-A whole task lifecycle should take about ten Vikunja calls: start 4 (read, assign, move, comment), pr 1, review 2, close 2-3. Read single tasks by id; list only in reconcile. Use `fields` to keep responses small.
+A whole task lifecycle should take about a dozen Vikunja calls: start 6 (read, re-read at claim, assign, move, comment, read-back), pr 1, review 2, close 2-3. Read single tasks by id; list only in reconcile. Use `fields` to keep responses small.
