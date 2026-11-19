@@ -4,6 +4,18 @@ An optional, owner-managed Linux runner for trusted private repositories that ex
 
 For execution improvements after runner adoption, use [CI execution performance](../ci-performance/README.md) with either CI strategy. Its [Kultomat case study](../ci-performance/case-study.md) records source-verified job/step timings and attribution limits. Results depend on the project and run conditions. This recipe provisions nothing automatically.
 
+## Quick path
+
+Each step links to the section that holds its details and caveats.
+
+1. Confirm the repository is private and trusted, and that a single-purpose Linux machine is acceptable: [Suitability and security](#suitability-and-security).
+2. Check current allowances and choose a machine: [Costs and machine options](#costs-and-machine-options). For Oracle, create the account, a budget alert and an SSH key: [step 1](#1-account-budget-and-access).
+3. Create the VM and install Docker and a `runner` user: [step 2](#2-create-the-vm), [step 3](#3-install-packages-and-create-the-runner-user). Adding a repository to an existing VM starts [here](#adding-another-repository-to-an-existing-runner-vm) instead.
+4. Register a runner for this repository with a unique label and install its service: [step 4](#4-register-per-repository-and-install-the-service).
+5. If the project runs Playwright, install its system libraries once: [step 5](#5-prepare-browser-libraries-once).
+6. Adapt the [combined workflow example](#adapt-the-combined-workflow) to the project's real suites.
+7. Only after the runner shows Idle in this repository, set `CI_RUNNER`: [step 6](#6-set-routing-and-housekeeping). Then work through the [acceptance checklist](#acceptance-checklist).
+
 ## Suitability and security
 
 Use this persistent-machine recipe only for private repositories whose code, contributors, dependencies and workflow changes you trust. Do not use it for public/fork PR code. Private status alone is not an isolation boundary: an untrusted collaborator or compromised dependency can control the machine. GitHub recommends private repositories for self-hosting because public fork PRs can execute dangerous code ([adding runners](https://docs.github.com/en/actions/how-tos/manage-runners/self-hosted-runners/add-runners), read **2026-11-06**).

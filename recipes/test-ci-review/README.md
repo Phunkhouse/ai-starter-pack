@@ -12,7 +12,14 @@ Select `test-ci-review` in the bootstrap's optional integrations or request it l
 
 ## Dependency and invocation
 
-Install `audit-test-ci` from the [AI Audit Toolkit](https://github.com/Phunkhouse/ai-audit-toolkit) following its installation instructions. Use a version containing this skill and preserve access to its shared references/templates. Record the toolkit revision in the report. If the skill or its source cannot be accessed, identify the missing dependency rather than claiming the audit ran. No specific framework, CI provider, runner, model or paid plan is required.
+Install `audit-test-ci` from the [AI Audit Toolkit](https://github.com/Phunkhouse/ai-audit-toolkit). Its installer links every audit skill from a local clone into `~/.claude/skills` and `~/.agents/skills`; `git pull` in the clone updates them:
+
+```sh
+git clone https://github.com/Phunkhouse/ai-audit-toolkit.git <TOOLKIT_DIR>
+cd <TOOLKIT_DIR> && ./scripts/install.sh
+```
+
+Use a version containing this skill and preserve access to its shared references/templates. Record the toolkit revision in the report. If the skill or its source cannot be accessed, identify the missing dependency rather than claiming the audit ran. No specific framework, CI provider, runner, model or paid plan is required.
 
 Invoke the skill in the target project:
 

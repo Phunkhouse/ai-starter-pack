@@ -10,7 +10,14 @@ Assess features, not labels such as microsite or large application. Useful signa
 
 ## Dependency and invocation
 
-Install `audit-scalability-cost` from the [AI Audit Toolkit](https://github.com/Phunkhouse/ai-audit-toolkit), following its installation instructions. Use a version with **Planning** and **Audit** modes, keeping its shared references and templates available. If it is missing or outdated, report that dependency rather than claiming the review ran. No particular provider, model or paid plan is imposed by this recipe.
+Install `audit-scalability-cost` from the [AI Audit Toolkit](https://github.com/Phunkhouse/ai-audit-toolkit). Its installer links every audit skill from a local clone into `~/.claude/skills` and `~/.agents/skills`; `git pull` in the clone updates them:
+
+```sh
+git clone https://github.com/Phunkhouse/ai-audit-toolkit.git <TOOLKIT_DIR>
+cd <TOOLKIT_DIR> && ./scripts/install.sh
+```
+
+Use a version with **Planning** and **Audit** modes, keeping its shared references and templates available. If it is missing or outdated, report that dependency rather than claiming the review ran. No particular provider, model or paid plan is imposed by this recipe.
 
 ```text
 Use audit-scalability-cost in Planning mode for this project's specification.
