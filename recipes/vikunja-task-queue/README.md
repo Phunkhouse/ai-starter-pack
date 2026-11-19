@@ -40,7 +40,7 @@ For each bot, create an expiring API token starting with **Typed tools read + wr
 | Projects Views | Read All/One |
 | Projects Views Tasks | Read All |
 | Tasks | Read All/One, Create, Update |
-| Task comments | Read All/One, Create; no Update/Delete needed for append-only progress |
+| Task comments | Read All/One, Create, Update (the agent edits its own status comment in place); no Delete |
 | Task assignees | Read All, Create for claims |
 | Labels | Read All/One only; no definition Create/Update/Delete |
 | Tasks Labels | Read All, Create/Delete **associations**, not label definitions |
@@ -73,13 +73,13 @@ The helper prints JSON string headers to stdout for the client only. Check `/mcp
 
 ## Lifecycle skill and reminder hook (optional)
 
-[skills/task-sync/SKILL.md](skills/task-sync/SKILL.md) keeps a task in step with the work: **start** (one read with comments and column, then claim at the first real change), **checkpoint**, **pr**, **review**, **ci**, **close** (Done per the project's Done policy), **capture** (propose, create on the owner's yes) and **reconcile** (one `tasks_list` per project filtered on the In Progress and Review buckets, then `gh pr view` per linked PR). Each agent keeps one `**Agent status**` comment per task and edits it in place. Project values come from the project's AGENTS.md section, so the skill holds none. It uses about ten Vikunja calls per task.
+[skills/task-sync/SKILL.md](skills/task-sync/SKILL.md) keeps a task in step with the work: **start** (one read with comments and column, then claim at the first real change), **checkpoint**, **pr**, **review**, **ci**, **close** (Done per the project's Done policy), **capture** (propose, create on the owner's yes) and **reconcile** (one `tasks_list` per project filtered on the In Progress and Review buckets, then `gh pr view` per linked PR). Each agent keeps one `**Agent status**` comment per task and edits it in place. Project values come from the project's AGENTS.md section, so the skill holds none. It uses about a dozen Vikunja calls per task.
 
 Install it like other shared Skills, as links from a local clone of this repository: `ln -s <CLONE>/recipes/vikunja-task-queue/skills/task-sync ~/.claude/skills/task-sync` (Claude Code) and the same into `~/.agents/skills/` (Codex). Start a new session to load it.
 
 Nothing runs while no agent is running. Merges are noticed by the next **reconcile** ("sync the board"); a GitHub Action posting merge comments would need a comment-only bot, its tokens as Actions secrets and hosted-runner minutes, and it should never move tasks.
 
-When Vikunja is unreachable, the skill appends intended updates to `~/.local/state/task-sync/outbox.md` (no secrets) and the next reconcile applies them. Column state can always be derived again from GitHub.
+When Vikunja is unreachable, the skill appends intended updates to a per-bot `~/.local/state/task-sync/outbox-<bot user>.md` (no secrets) and that bot's next reconcile applies them. Column state can always be derived again from GitHub.
 
 **Claude Code reminder hook:** [task-sync-reminder.sh](examples/task-sync-reminder.sh) runs after `gh pr create` and `gh pr ready`. When the branch's PR body has a `Task:` line, it tells the agent that the task-sync `pr` or `review` step has not run. It makes no Vikunja call and exits silently on any failure. It needs `jq`, `gh` and `timeout`. Copy it to `~/.claude/hooks/` with mode 755 and add to `~/.claude/settings.json`:
 
@@ -111,7 +111,7 @@ Install Bash, `flock`, curl, tar and restic on the Linux host. Install [backup.s
 
 Create `/etc/vikunja-backup.env` mode 600 with `COMPOSE_DIR=/opt/vikunja`, `RESTIC_REPOSITORY=s3:https://<S3_ENDPOINT>/<BUCKET_ID>/<PREFIX>`, `RESTIC_PASSWORD_FILE=<PRIVATE_PASSWORD_FILE>`, the backend's scoped `AWS_ACCESS_KEY_ID`/`AWS_SECRET_ACCESS_KEY` and optional `HEALTHCHECKS_URL=<PRIVATE_PING_URL>`. Use a separate S3-compatible bucket/key limited to that bucket/prefix and restic's required list/read/write permissions. Keep encryption-password recovery and S3 credentials outside the deployment backup. Do not commit that environment file. Initialize the restic repository once in a protected owner shell, validate a backup manually, then `systemctl daemon-reload` and `systemctl enable --now vikunja-backup.timer`.
 
-The snapshot contains **secrets** from `.env`, including the service secret and connector token: restrict local staging and remote access and rely on restic encryption, not bucket privacy alone. The script sends Healthchecks start/success/failure without uploading logs; configure a missing-ping alert. Check `systemctl status`, `journalctl` privately, snapshots and periodic `restic check`; set retention and restore frequency as owner policy. [Restic backend/password documentation](https://restic.readthedocs.io/en/stable/030_preparing_a_new_repo.html), [Healthchecks signals](https://healthchecks.io/docs/http_api/) (read 2026-11-18).
+The snapshot contains **secrets** from `.env`, including the service secret and connector token: restrict local staging and remote access and rely on restic encryption, not bucket privacy alone. The script sends Healthchecks start/success/failure without uploading logs; configure a missing-ping alert. An unreachable Healthchecks endpoint does not stop the backup, but a failed success ping still marks the run failed. Check `systemctl status`, `journalctl` privately, snapshots and periodic `restic check`; set retention and restore frequency as owner policy. [Restic backend/password documentation](https://restic.readthedocs.io/en/stable/030_preparing_a_new_repo.html), [Healthchecks signals](https://healthchecks.io/docs/http_api/) (read 2026-11-18).
 
 Test recovery **before relying on backups**:
 

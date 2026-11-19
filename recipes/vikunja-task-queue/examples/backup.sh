@@ -40,7 +40,8 @@ cleanup() {
 trap cleanup EXIT
 trap 'exit 143' TERM
 trap 'exit 130' INT
-ping_check /start
+# An unreachable monitor must not prevent the backup itself.
+ping_check /start || true
 
 # Never start an intentionally stopped deployment as a side effect of a backup.
 "${compose[@]}" ps --status running --services | grep -Fxq vikunja
