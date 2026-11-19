@@ -4,6 +4,8 @@ A small, opinionated set of instructions and files for starting an application w
 
 ## Use it in a new repository
 
+To delegate these steps to an agent, use the [bootstrap prompt](BOOTSTRAP.md).
+
 1. Create the new project with its official generator. For the current Next.js profile, choose TypeScript, the App Router, `src/`, pnpm and no Tailwind.
 2. Copy the shared files, including dotfiles, into the target repository:
 
@@ -11,26 +13,37 @@ A small, opinionated set of instructions and files for starting an application w
    rsync -a --ignore-existing /absolute/path/to/ai-starter-pack/template/core/ /absolute/path/to/new-project/
    ```
 
-3. Choose a [stack recipe](recipes/next-fullstack/README.md). For Next.js, inspect its `files/` directory and copy the files that fit your generated project. Compare any existing configuration before merging it; `--ignore-existing` deliberately leaves existing files untouched.
-4. Add optional integrations when useful: [Claude PR review](recipes/claude-pr-review/README.md) for on-demand GitHub reviews, or the [Playwright E2E CI guide](recipes/playwright-e2e/README.md) for choosing a browser-test setup.
-5. Adapt the target project's root `README.md` (the generator may already provide one), complete `docs/SPEC.md` and `docs/design/`, and adapt `AGENTS.md`. Add `docs/MILESTONES.md` when development stages are agreed. Replace the command placeholder in `AGENTS.md` with scripts that actually exist in the new `package.json`.
+   `--ignore-existing` deliberately leaves existing files untouched, so **merge any file the generator already created by hand**. Next.js 16 generates its own `AGENTS.md`: keep its marked `nextjs-agent-rules` block (`next dev` re-adds it) and add the pack's `AGENTS.md` content below it. Compare the generator's `README.md` and ESLint config the same way.
+3. Choose a stack recipe and any optional recipes from the [table below](#recipes). Read each one before copying its files, and paste its `AGENTS-section.md` into the target `AGENTS.md` when it has one.
+4. Adapt the target's root `README.md`, complete `docs/SPEC.md` and `docs/design/`, and replace the `TODO` command line in `AGENTS.md` with scripts that actually exist in the new `package.json`. In an existing repository, reconcile any earlier project brief with `docs/SPEC.md` so there is one source of truth.
+5. Record the pack revision you applied (`git -C /absolute/path/to/ai-starter-pack rev-parse --short HEAD`) in the target's `docs/SPEC.md` under Technical approach, so later pack changes can be compared with what the project received.
 6. Install and configure the tools described by the selected recipes, run the relevant checks, then commit the resulting project.
 
-To delegate setup to an agent, use the [bootstrap prompt](BOOTSTRAP.md).
+When development stages are agreed, copy the optional [milestone template](template/optional/docs/MILESTONES.md) into the target's `docs/` and replace its prompts with the actual plan. Each milestone needs observable acceptance checks, a way to verify them and completion evidence. A milestone can span several PRs, which still follow the one-at-a-time cadence.
 
-At setup, offer [lightweight scalability and cost planning](recipes/scalability-planning/README.md) when workloads, storage, external APIs, jobs or reliability needs affect early decisions. It uses the external `audit-scalability-cost` skill in Planning mode. A simple static project may need only a brief relevance assessment. Start with the smallest sufficient setup, explicit assumptions and measurable triggers for revisiting it.
+## Recipes
 
-Optionally enable [legal planning](recipes/legal-planning/README.md) after the first specification and before feature implementation. It uses the external `audit-legal-readiness` skill in Planning mode, followed by a Pre-launch review of the built product. Both modes recommend a top-tier reasoning model with high reasoning effort and prioritize verified sources over token savings.
+Every recipe except the stack recipe is optional. Each README holds that recipe's conditions and caveats.
 
-Choose [Standard or Budget-conscious CI](recipes/ci-strategy/README.md) during setup or later. Standard is the default. Both use local validation and require the same independent cloud checks before merge; Budget-conscious skips draft PR jobs until the user authorizes ready for review. Inspect actual ready-state suite results before merging; a skipped draft check is not validation evidence. The policy is provider-independent, with optional GitHub Actions examples.
+| Recipe | Use when | Brings |
+| --- | --- | --- |
+| [Next.js full-stack](recipes/next-fullstack/README.md) | Stack recipe for a TypeScript Next.js app. | `files/`: CI workflow, ESLint, Prettier, `.nvmrc` |
+| [CI strategy](recipes/ci-strategy/README.md) | Always read at setup. Standard is the default; Budget-conscious skips draft PR jobs until the user approves ready for review. | `examples/`: budget workflows; `AGENTS-section.md` for Budget-conscious |
+| [Claude PR review](recipes/claude-pr-review/README.md) | You want on-demand `@claude review` comments on GitHub PRs. | `files/`: workflow |
+| [Playwright E2E](recipes/playwright-e2e/README.md) | The project has browser tests and needs to choose a CI environment for them. | `files/`: container workflow |
+| [Scalability and cost planning](recipes/scalability-planning/README.md) | Offered at setup by default; most useful when databases, uploads, paid APIs, jobs or reliability needs shape early decisions. | `AGENTS-section.md`; uses the external `audit-scalability-cost` skill |
+| [Legal planning](recipes/legal-planning/README.md) | After the first specification and before features, then a Pre-launch review. | `AGENTS-section.md`; uses the external `audit-legal-readiness` skill |
+| [Test and CI review](recipes/test-ci-review/README.md) | Real tests and CI exist and feedback is slow, costly or flaky. Not a bootstrap audit. | Uses the external `audit-test-ci` skill |
+| [CI execution performance](recipes/ci-performance/README.md) | Bounded worker, cache and duplicate-work improvements under either strategy. | Guidance and a measured [case study](recipes/ci-performance/case-study.md) |
+| [Self-hosted runner](recipes/self-hosted-runner/README.md) | A trusted private repository exhausts its included GitHub Actions minutes. | `examples/`: combined workflow |
+| [Vercel deployment budget](recipes/vercel-deployment-budget/README.md) | A Vercel project under Budget-conscious CI hits deployment limits. | Config fragment, after a preview-dependency review |
+| [Vikunja task queue](recipes/vikunja-task-queue/README.md) | Ideas and findings arrive faster than they can be implemented, and you want a self-hosted owner/agent queue. | `examples/`, `AGENTS-section.md`, `task-sync` skill |
 
-Optionally use [Test and CI efficiency review](recipes/test-ci-review/README.md) once real tests/CI exist, especially when feedback is slow, compute or maintenance is costly, failures recur or runner changes are being considered. It invokes the external `audit-test-ci` skill for an evidence-based report before a separate implementation task. It preserves meaningful coverage and required gates, can recommend keeping the setup, and is not a mandatory bootstrap audit or a CI strategy switch.
+How recipes are packaged:
 
-Use [CI execution performance](recipes/ci-performance/README.md) for bounded improvements under either Standard or Budget-conscious CI: actual worker/resource checks, compatible caches, repeated setup/build work and preserved validation. It distinguishes hosted from persistent-runner conditions without changing scheduling policy. The [Kultomat case study](recipes/ci-performance/case-study.md) records verified CI job/step timings and their attribution limits; it is not a default configuration or a savings promise.
-
-When development stages are agreed, copy the optional [milestone template](template/optional/docs/MILESTONES.md) into the target project's `docs/` directory and replace its prompts with the actual plan. Each milestone should have observable acceptance checks, a way to verify them and completion evidence. A milestone can span multiple PRs, which still follow the one-at-a-time review cadence.
-
-When applying the pack to an existing repository, reconcile any earlier project brief or specification with `docs/SPEC.md` so the project does not keep competing sources of truth.
+- `files/` mirrors the target repository and can be copied with `rsync -a --ignore-existing <recipe>/files/ <target>/`, then adapted.
+- `examples/` holds starting points to adapt into the target's existing files, not to install alongside them.
+- `AGENTS-section.md` is pasted into the target `AGENTS.md` only when the recipe is adopted, so the core instructions stay short.
 
 ## Commit messages
 
@@ -58,25 +71,16 @@ For example, replace these placeholders with verified project details and choose
 | --- | --- |
 | `template/core/` | Project README, specification, design and decision templates, agent instructions and EditorConfig. |
 | `template/optional/` | Milestone template to copy when development stages are agreed. |
-| `recipes/next-fullstack/` | Next.js setup guide and optional Next.js and JavaScript tooling files. |
-| `recipes/claude-pr-review/` | Optional GitHub workflow and setup guide for `@claude review` on pull requests. |
-| `recipes/playwright-e2e/` | E2E CI decision guide and optional Playwright container workflow. |
-| `recipes/ci-strategy/` | Local validation policy, CI strategy selection and optional budget GitHub Actions examples. |
-| `recipes/vikunja-task-queue/` | Optional self-hosted owner/agent work queue via native Vikunja MCP, with scoped bots, backup examples and project instructions. |
-| `recipes/vercel-deployment-budget/` | Optional production/opt-in-preview Git deployment policy after reviewing Vercel dependencies and obtaining user agreement. |
-| `recipes/test-ci-review/` | Optional evidence-based test/CI efficiency review and handoff to the external audit skill before implementation. |
-| `recipes/ci-performance/` | Shared execution-performance guidance for either CI strategy, runner-specific conditions and a scoped Kultomat case study. |
-| `recipes/self-hosted-runner/` | Optional private-repository Linux CI runner, Oracle ARM setup and GitHub-hosted fallback for either CI strategy. |
-| `recipes/legal-planning/` | Optional specification-based legal preparation and handoff to the external legal readiness skill. |
-| `recipes/scalability-planning/` | Lightweight capacity and cost planning, relevance assessment and handoff to the external scalability/cost skill. |
-| `BOOTSTRAP.md` | Prompt for applying the pack to a new repository. |
+| `recipes/` | Stack and optional recipes, listed [above](#recipes). |
+| `BOOTSTRAP.md` | Prompt for applying the pack to a new repository with an agent. |
 
 More recipes can be added without making the core assume a framework or language. In particular, the Next.js ESLint config and Prettier preferences belong to its recipe, not to the core.
 
 ## Maintenance principles
 
 - Agent instructions say **what** to do and **when**. Enforceable rules belong in configuration and CI. The reasons behind choices belong in decision records.
-- Try a general rule in a real project before adding it here. Keep `AGENTS.md` short, accurate and relevant to the task.
+- Try a general rule in a real project before adding it here. Keep `AGENTS.md` short, accurate and relevant to the task; put recipe-specific rules in that recipe's `AGENTS-section.md`.
+- State each rule in one place. The README and bootstrap prompt point to recipes rather than restating their caveats.
 - Compare recipes with the documentation for the framework version actually installed in the target project.
 - Keep secrets, personal data, real customer examples and values from `.env` out of this potentially public pack.
 

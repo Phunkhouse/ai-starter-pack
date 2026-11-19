@@ -15,7 +15,7 @@ Use [CI execution performance](../ci-performance/README.md) for targeted executi
 
 Keep the existing one-PR-at-a-time cadence. Ready permission does not authorize merge; leave merging to the user unless explicitly authorized. Neither strategy permits bypassing checks or substituting local results for independent CI.
 
-Record `CI strategy: Standard` or `CI strategy: Budget-conscious` in the target project's `AGENTS.md`. Keep the executable behavior in the provider's existing workflow configuration. No repository variables, strategy parser or generated configuration are needed. For another provider, implement equivalent draft/readiness events and a required result that only passes after actual validation.
+The core `AGENTS.md` records `CI strategy: Standard`. For Budget-conscious, replace that line with this recipe's [AGENTS snippet](AGENTS-section.md) once the workflows implement it. Keep the executable behavior in the provider's existing workflow configuration. No repository variables, strategy parser or generated configuration are needed. For another provider, implement equivalent draft/readiness events and a required result that only passes after actual validation.
 
 ## Local validation
 
