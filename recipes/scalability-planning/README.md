@@ -4,7 +4,7 @@ Offer a short review after the first specification, before dependent infrastruct
 
 ## Offer according to relevance
 
-Bootstrap defaults to **offer**: assess relevance and include the option in the initial plan, then run Planning when the user accepts it or has selected **enabled**. An explicit **omitted** selection skips it. Do not make it a compulsory audit or block unrelated development.
+Bootstrap defaults to **offer**: assess relevance and include the option in the initial plan, then run Planning when the user accepts it or has selected **enabled**. An explicit **omitted** selection skips it. When planning is enabled or accepted, paste this recipe's [AGENTS snippet](AGENTS-section.md) into the target project's `AGENTS.md`. Do not make it a compulsory audit or block unrelated development.
 
 Assess features, not labels such as microsite or large application. Useful signals include a database, user-generated content, growing storage, uploads/media, paid APIs or AI, email, background jobs/imports, bursty demand and availability/recovery requirements. A small site can still have an expensive external operation. For a bounded static site without material variable costs or operational needs, explain briefly why deeper planning is unnecessary. Do not invent growth risks to justify running the skill.
 

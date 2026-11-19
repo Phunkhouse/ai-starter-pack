@@ -20,7 +20,7 @@ What data is stored? Which inputs or external responses must the server verify? 
 
 ## Technical approach
 
-Record the actual framework, package manager, database, hosting, styling, localization, test layers and commands. Link to a decision record when the reason for a choice matters later.
+Record the actual framework, package manager, database, hosting, styling, localization, test layers and commands. Link to a decision record when the reason for a choice matters later. Note the starter pack revision and recipes applied, so later pack changes can be compared.
 
 ## Known limitations and risks
 

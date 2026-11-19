@@ -1,0 +1,3 @@
+- CI strategy: Budget-conscious. Validation jobs are skipped on draft PRs until ready for review; every later commit to a ready PR still needs full cloud validation.
+- Create draft PRs and obtain explicit user permission before marking them ready. Permission to request review is not permission to merge. Do not bypass checks or change the strategy to avoid a failure.
+- A skipped draft check is not evidence of testing. Before any authorized merge, inspect the current revision's ready-state run and its actual suite results.
