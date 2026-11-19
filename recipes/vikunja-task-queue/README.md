@@ -2,6 +2,18 @@
 
 Optional self-hosted work queue when ideas and findings arrive faster than the owner and coding agents can implement them. GitHub remains authoritative for code, CI and PRs; SPEC/milestones remain the product plan. Queue entries do not dispatch agents, authorize implementation or merge PRs. No default changes to `template/core/AGENTS.md` are needed: paste and adapt the separate [project snippet](AGENTS-section.md) only when opting in.
 
+## Quick path
+
+Each step links to the section that holds its details and caveats. Steps 1–4 and 6 are owner actions.
+
+1. Check the version, architecture and capacity limits: [Reference and architecture](#reference-and-architecture).
+2. Deploy Vikunja behind Cloudflare Access with the example compose file, configuring Access before publishing the tunnel: [Owner deployment checklist](#owner-deployment-checklist).
+3. Create the project, Kanban buckets, labels and one bot identity per agent with a narrow, expiring token: [Projects, bots and narrow tokens](#projects-bots-and-narrow-tokens).
+4. Store each bot's credentials in Keychain and register the MCP server in Claude Code or Codex: [Agent clients](#agent-clients-local-secrets-explicit-writes).
+5. Paste the [project snippet](AGENTS-section.md) into the target `AGENTS.md` with real IDs. Optionally install the `task-sync` skill and reminder hook: [Lifecycle skill](#lifecycle-skill-and-reminder-hook-optional).
+6. Set up backups and complete one restore drill before relying on them: [Backups and restore drill](#backups-and-restore-drill).
+7. Run the access, permission and conflict checks before enabling agents: [Verification and operations](#verification-and-operations).
+
 ## Reference and architecture
 
 Checked **2026-11-18** against official Vikunja **v2.8.0**, commit `6e788bf87cebe50e2b8d034b213fcf94ae5449ee`. The official changelog lists it as the latest stable release on that date. Recheck releases and security advisories before deployment; no image digest or production installation is certified by this recipe.

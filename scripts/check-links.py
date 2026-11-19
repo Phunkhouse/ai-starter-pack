@@ -16,7 +16,8 @@ HEADING = re.compile(r"^#{1,6} +(.+?) *#*$", re.M)
 
 
 def slug(heading: str) -> str:
-    text = re.sub(r"[`*_\[\]]|\(.*?\)", "", heading).strip().lower()
+    """GitHub-style anchor: link text kept, punctuation dropped, spaces to hyphens."""
+    text = re.sub(r"\[([^\]]*)\]\([^)]*\)", r"\1", heading).strip().lower()
     return re.sub(r"[^\w\- ]", "", text).replace(" ", "-")
 
 

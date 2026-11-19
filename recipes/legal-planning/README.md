@@ -4,7 +4,14 @@ Optional legal preparation after the first project specification, before depende
 
 ## Prerequisite and model choice
 
-Install `audit-legal-readiness` from the [AI Audit Toolkit](https://github.com/Phunkhouse/ai-audit-toolkit) using that repository's installation instructions. Use a version supporting both Planning and Pre-launch modes. Keep the toolkit's shared references and templates available; do not copy only `SKILL.md` and lose its supporting sources. No absolute machine path or specific provider is required by this recipe. If the skill is unavailable or outdated, report that dependency and resolve it before claiming the review has run.
+Install `audit-legal-readiness` from the [AI Audit Toolkit](https://github.com/Phunkhouse/ai-audit-toolkit). Its installer links every audit skill from a local clone into `~/.claude/skills` and `~/.agents/skills`; `git pull` in the clone updates them:
+
+```sh
+git clone https://github.com/Phunkhouse/ai-audit-toolkit.git <TOOLKIT_DIR>
+cd <TOOLKIT_DIR> && ./scripts/install.sh
+```
+
+Use a version supporting both Planning and Pre-launch modes. Keep the toolkit's shared references and templates available; do not copy only `SKILL.md` and lose its supporting sources. No absolute machine path or specific provider is required by this recipe. If the skill is unavailable or outdated, report that dependency and resolve it before claiming the review has run.
 
 **Use a top-tier reasoning model with high reasoning effort, or the closest supported equivalent, for either mode. Prioritize thorough research and completeness over token cost or speed.** The agent should announce the model and reasoning setting when reliably known; if weaker, warn and recommend switching, and if unknown, say that it cannot verify the setup. A prompt is not a model-switching mechanism: do not claim a switch without actually performing one through supported controls. Record known settings and limitations in the report. No fixed vendor/model name is embedded because available models change.
 
