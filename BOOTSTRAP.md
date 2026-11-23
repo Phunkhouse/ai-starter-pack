@@ -7,6 +7,7 @@ I am starting a new application: <one to three sentences about its purpose and u
 
 The starter pack is at <absolute path to ai-starter-pack>.
 The target repository is at <absolute path to the new repository>.
+Its Git remote is <SSH URL with my host alias, e.g. git@github-work:owner/repo.git>.
 The stack recipe is <next-fullstack, or none>.
 The optional recipes are <any of: claude-pr-review, playwright-e2e, seed-data, test-ci-review, ci-performance, self-hosted-runner, vercel-deployment-budget, vikunja-task-queue; or none>.
 The CI strategy is <Standard (default) or Budget-conscious>.
@@ -33,8 +34,8 @@ Run audits only as their recipes describe: each external skill writes only its r
 
 Run the available checks and summarize the changes, results and unresolved questions.
 
-4. Pull requests
-Follow AGENTS.md: one PR at a time, waiting for me to merge or close each before starting the next; an IMPORTANT owner-actions block at the top of the PR description when migrations, secrets or remote-machine steps are needed, repeated in chat. Leave the merge to me.
+4. Git and pull requests
+Set origin to the Git remote above, record it in AGENTS.md's Git remote section, and fetch and push only over SSH through that alias. If SSH fails, stop and tell me; do not switch to HTTPS or a token. Follow AGENTS.md: one PR at a time, waiting for me to merge or close each before starting the next; an IMPORTANT owner-actions block at the top of the PR description when migrations, secrets or remote-machine steps are needed, repeated in chat. Leave the merge to me.
 ```
 
 If the project does not use Next.js, do not copy files from `recipes/next-fullstack/files/`. Use the shared core and a recipe appropriate to its stack.
