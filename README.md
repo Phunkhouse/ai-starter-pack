@@ -37,6 +37,7 @@ Every recipe except the stack recipe is optional. Each README holds that recipe'
 | [CI execution performance](recipes/ci-performance/README.md) | Bounded worker, cache and duplicate-work improvements under either strategy. | Guidance and a measured [case study](recipes/ci-performance/case-study.md) |
 | [Self-hosted runner](recipes/self-hosted-runner/README.md) | A trusted private repository exhausts its included GitHub Actions minutes. | `examples/`: combined workflow |
 | [Vercel deployment budget](recipes/vercel-deployment-budget/README.md) | A Vercel project under Budget-conscious CI hits deployment limits. | Config fragment, after a preview-dependency review |
+| [Seed data](recipes/seed-data/README.md) | The project has a database: invented local data that shows every state and feature, with safety guards. | `examples/`, `AGENTS-section.md` |
 | [Vikunja task queue](recipes/vikunja-task-queue/README.md) | Ideas and findings arrive faster than they can be implemented, and you want a self-hosted owner/agent queue. | `examples/`, `AGENTS-section.md`, `task-sync` skill |
 
 How recipes are packaged:

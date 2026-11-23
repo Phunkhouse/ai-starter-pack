@@ -25,7 +25,7 @@ A fixed LAN IP may change. If that becomes a problem, use a stable local hostnam
 
 - Start with route files and components. Create `src/server/` when there is real business logic to isolate. If created, enforce its framework boundary with `no-restricted-imports` in ESLint.
 - Keep route handlers and server actions thin: parse input, call services and return a result. Recompute trusted values on the server.
-- Add database migrations and integration tests when the application has a database. The database and migration tool are project choices, not starter defaults.
+- Add database migrations and integration tests when the application has a database. The database and migration tool are project choices, not starter defaults. Offer the [seed data recipe](../seed-data/README.md) with the first migration.
 
 ## UI and CSS
 
