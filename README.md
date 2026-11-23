@@ -17,9 +17,28 @@ To delegate these steps to an agent, use the [bootstrap prompt](BOOTSTRAP.md).
 3. Choose a stack recipe and any optional recipes from the [table below](#recipes). Read each one before copying its files, and paste its `AGENTS-section.md` into the target `AGENTS.md` when it has one.
 4. Adapt the target's root `README.md`, complete `docs/SPEC.md` and `docs/design/`, and replace the `TODO` command line in `AGENTS.md` with scripts that actually exist in the new `package.json`. In an existing repository, reconcile any earlier project brief with `docs/SPEC.md` so there is one source of truth.
 5. Record the pack revision you applied (`git -C /absolute/path/to/ai-starter-pack rev-parse --short HEAD`) in the target's `docs/SPEC.md` under Technical approach, so later pack changes can be compared with what the project received.
-6. Install and configure the tools described by the selected recipes, run the relevant checks, then commit the resulting project.
+6. Set `origin` to the SSH URL with your host alias and record it in the Git remote section of `AGENTS.md` (see [Git over SSH](#git-over-ssh)).
+7. Install and configure the tools described by the selected recipes, run the relevant checks, then commit and push the resulting project.
 
 When development stages are agreed, copy the optional [milestone template](template/optional/docs/MILESTONES.md) into the target's `docs/` and replace its prompts with the actual plan. Each milestone needs observable acceptance checks, a way to verify them and completion evidence. A milestone can span several PRs, which still follow the one-at-a-time cadence.
+
+## Git over SSH
+
+Each project names its account explicitly through an SSH host alias, so an agent never guesses which identity to use and never falls back to HTTPS or a token. Define one alias per GitHub account in `~/.ssh/config`:
+
+```sshconfig
+Host github-work
+  HostName github.com
+  User git
+  IdentityFile ~/.ssh/id_work
+  IdentitiesOnly yes
+  AddKeysToAgent yes
+  UseKeychain yes
+```
+
+`UseKeychain` (macOS) keeps the key's passphrase in the Keychain and `AddKeysToAgent` loads it on first use, so remotes keep working after a restart without `ssh-add`. On Linux, drop `UseKeychain` and rely on the desktop keyring or an agent started at login. Check an alias with `ssh -T git@github-work`.
+
+Clone and add remotes with the alias, never with a plain `github.com` or HTTPS URL: `git clone git@github-work:owner/repo.git`. GitHub's "Code" button shows the plain form, so replace `github.com` with the alias when copying it. To fix an existing repository: `git remote set-url origin git@github-work:owner/repo.git`.
 
 ## Recipes
 

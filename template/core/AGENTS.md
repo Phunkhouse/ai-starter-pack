@@ -41,6 +41,11 @@ Before changing code, inspect the relevant files and the installed framework's d
 - If `docs/MILESTONES.md` exists, use its acceptance checks to guide the current milestone. Before calling a milestone complete, verify each check, record evidence and unresolved gaps there, and request user validation for product or visual judgments. A passing CI run alone does not establish that the intended outcome works.
 - Do not commit secrets, `.env` files or personal data. If the project needs environment variables, create `.env.example` with names and safe examples only.
 
+## Git remote
+
+- Remote: `<git@HOST_ALIAS:OWNER/REPOSITORY.git>`. Fetch and push only over SSH through this host alias, and use the same alias for any clone or added remote.
+- If SSH fails (for example `Permission denied (publickey)`), stop and report it. Do not switch to HTTPS, a token or another account to get around it.
+
 ## Pull requests
 
 - Inspect schema, configuration and operational changes for owner actions such as database migrations, service restarts or steps on a separate machine. When actions are required, put a `> [!IMPORTANT]` block at the very top of the PR description and repeat the actions in the chat handoff. Omit the block when no action is needed.
