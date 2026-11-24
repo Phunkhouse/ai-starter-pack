@@ -31,9 +31,12 @@ Decisions and what each one means:
 | `accepted` | The owner explicitly accepts the risk, with name, date and reason. Where the project's rules or agreements forbid accepting a kind of risk, it must be fixed instead; where they say nothing, the owner's explicit, dated acceptance is enough | Yes |
 | `backlog` | Deferred to a backlog item, with its reference | No: only medium and low gaps |
 
-The record ends with a **Move decision** line: `pending`, or `approved by <owner> on <YYYY-MM-DD>`.
+The record ends with a **Move decision** line: `pending`, or `approved by <owner> on <YYYY-MM-DD> for the record as of <YYYY-MM-DD>, covering <ids>`. An approval covers exactly the readiness state the owner reviewed: the listed rows, each with the severity, decision and evidence it had on the "as of" date.
 
-Write shareable wording only. Exploitable details, credentials and personal data stay in the audit reports, kept where the AI Audit Toolkit's handling rules say: in a public repository, `docs/audits/` stays private or ignored until the fixes are in place. The record refers to such findings by id.
+- **What resets it:** a new gap, or a changed severity, decision or evidence on any row, makes that approval stale. Set the line back to `pending` and move the old line to an **Approval history** list below it. Rows that did not change keep their decisions.
+- **What keeps it:** a rerun that finds the same rows unchanged.
+
+Write shareable wording only. Audit reports themselves omit credentials and personal data and redact other sensitive details, such as exploit steps. Evidence that must be kept is stored redacted in the approved private location: as the AI Audit Toolkit's handling rules say, in a public repository `docs/audits/` stays private or ignored until the fixes are in place. The committed record refers to private findings by id only.
 
 ## 1. Preview
 
@@ -60,13 +63,16 @@ The profile stays MVP during this whole stage. Each step names its check; skip i
    - **Legal readiness**, when the project stores personal data or has real users: the [legal planning recipe](../../../recipes/legal-planning/README.md), with Planning first if it never ran, then Pre-launch.
 
    _Present when_ each item is verified with evidence or has a row in the record.
-3. **Record.** Create or update `docs/readiness.md` with every gap from the preview, the audits and the evidence checks. Keep existing rows and their decisions; add only new ones. Set `Move decision: pending` if the line is missing. _Present when_ every known gap has a row.
+3. **Record.** Create or update `docs/readiness.md` with every gap from the preview, the audits and the evidence checks. Keep existing rows and their decisions; add only new ones. Set `Move decision: pending` if the line is missing. If this changes the readiness state an approval covers, reset the approval as [the readiness record](#the-readiness-record) describes. _Present when_ every known gap has a row, and the Move decision is `pending` or covers exactly the current rows.
 4. **Owner decisions.** Present the record to the owner and record each decision with owner, date and reason. Critical and high gaps resolve only as `fixed` with linked evidence, or `accepted` by the owner explicitly, with a date, where the project's rules allow it; `backlog` does not resolve them. Fixes are separate, focused changes outside this guide. _Present when_ every row has a decision other than `open`.
-5. **Readiness decision.** Stop while any critical or high gap is `open` or `backlog`. Report the blockers, rewrite `docs/STATUS.md` with a link to the record and the current blockers, and end. When nothing blocks, ask the owner whether to move to Production, as its own question, and record the answer on the Move decision line. _Present when_ the Move decision line says approved.
+5. **Readiness decision.** Stop while any critical or high gap is `open` or `backlog`. Report the blockers, rewrite `docs/STATUS.md` with a link to the record and the current blockers, and end. When nothing blocks and every row is decided, ask the owner whether to move to Production on the basis of the current record, as its own question. Record the answer on the Move decision line with the date, the record's date and the ids it covers. _Present when_ the Move decision line approves the current record.
 
 ## 3. Move
 
-Run only when the record's Move decision line says approved and no critical or high gap is unresolved. Otherwise the profile stays MVP.
+Run only when all of these hold; otherwise the profile stays MVP:
+- every current gap has a decision other than `open`;
+- no critical or high gap is unresolved;
+- the Move decision line approves the current record: it covers exactly the current rows, and none of them changed after the "as of" date.
 
 1. **Governance.** Profile `Production (since YYYY-MM-DD)` with the pack revision. Keep the project's history, such as "MVP since …", when it is known; for a project that predates profiles, say so instead. Record approved overrides, such as agent merges, with their reason, and link `docs/readiness.md`. _Present when_ the Governance line says Production.
 2. **Profile section.** Make `AGENTS.md` contain every rule of the Production [AGENTS section](AGENTS-section.md). If it has an MVP section, replace it with the Production section. If its rules sit under earlier headings, as in a project that predates profiles, keep that layout unless the owner asks for a restructure, and add only the Production rules it lacks. Carry over:
@@ -90,7 +96,7 @@ Before committing:
 1. Run `git status` and `git diff --cached --name-only`, and remove anything outside the approved list from the commit.
 2. Check the staged diff for credentials, personal data, exploitable details and internal-only links.
 
-Before opening the PR, check its description the same way. It gives the decision summary and links the record, never the reports. Sensitive evidence stays in its approved private location.
+Before opening the PR, check its description the same way. It gives the decision summary and links the record, never the reports. Evidence that must be kept stays redacted in its approved private location.
 
 Use `chore: upgrade to the Production profile` as the commit subject, through a PR when the project has a remote. A Readiness stage that ends at a blocker commits only `docs/readiness.md`, `docs/STATUS.md` and the backlog entries its decisions point to, under the same checks, as `docs: record Production readiness decisions`.
 
