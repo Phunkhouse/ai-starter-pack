@@ -14,7 +14,13 @@ For mature, long-lived applications: real users, several contributors or agents 
 
 ## Set up
 
-Follow the pack's [bootstrap prompt](../../../BOOTSTRAP.md) with `production` as the profile. It copies `template/core/` and this profile's `files/`, then composes `AGENTS.md` from the core and this profile's [AGENTS section](AGENTS-section.md).
+Follow the pack's [bootstrap prompt](../../../BOOTSTRAP.md), which sets up Production. It copies `template/core/` and this profile's `files/`, then composes `AGENTS.md` from the core and this profile's [AGENTS section](AGENTS-section.md).
+
+## Compatibility with setups from before profiles
+
+- **Existing projects keep the revision they adopted.** Their copied files do not change until the owner applies a newer pack revision to them. Without a Governance section they are treated as Production.
+- **New Production setups get the new core rules as well:** Governance, fact status, the conflict rule, scope and evidence, handover through `docs/STATUS.md`, and risk triggers. Every earlier rule is still there: the composed core and Production section were compared sentence by sentence with the earlier `AGENTS.md`, and the only reworded sentences are the one-line list of documents, now split between the core map and this profile's "further sources" line.
+- **Setup steps that copied only `template/core/` must change.** The core no longer contains the README, SPEC, design or decision templates, nor the validation, architecture, UI, testing, milestone and pull request rules. A script, prompt or habit that copied only `template/core/` now also needs to copy `template/profiles/production/files/` and paste this profile's [AGENTS section](AGENTS-section.md).
 
 ## Recipes and audits
 

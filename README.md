@@ -4,7 +4,7 @@ A small, opinionated set of instructions and files for starting an application w
 
 ## Use it in a new repository
 
-To delegate these steps to an agent, use the [bootstrap prompt](BOOTSTRAP.md); for a Sprint, use the short prompt in the [Sprint profile](template/profiles/sprint/README.md#set-up-in-five-minutes).
+To delegate these steps to an agent, use the [bootstrap prompt](BOOTSTRAP.md); for a Sprint, use the short prompt in the [Sprint profile](template/profiles/sprint/README.md#set-up).
 
 1. Choose a [governance profile](#governance-profiles).
 2. Create the new project with its official generator. For the current Next.js recipe, choose TypeScript, the App Router, `src/`, pnpm and no Tailwind.
@@ -15,7 +15,7 @@ To delegate these steps to an agent, use the [bootstrap prompt](BOOTSTRAP.md); f
    rsync -a --ignore-existing /absolute/path/to/ai-starter-pack/template/profiles/<profile>/files/ /absolute/path/to/new-project/
    ```
 
-   `--ignore-existing` deliberately leaves existing files untouched, so **merge any file the generator already created by hand**. Next.js 16 generates its own `AGENTS.md`: keep its marked `nextjs-agent-rules` block (`next dev` re-adds it) and add the pack's `AGENTS.md` content below it. Compare the generator's `README.md` and ESLint config the same way.
+   Both copies are needed: `template/core/` alone is no longer a complete project, because the README, SPEC, design and decision templates moved into the profiles. `--ignore-existing` deliberately leaves existing files untouched, so **merge any file the generator already created by hand**. Next.js 16 generates its own `AGENTS.md`: keep its marked `nextjs-agent-rules` block (`next dev` re-adds it) and add the pack's `AGENTS.md` content below it. Compare the generator's `README.md` and ESLint config the same way.
 4. Paste the profile's `AGENTS-section.md` where the core `AGENTS.md` marks it. Choose a stack recipe and any optional recipes from the [table below](#recipes); read each one before copying its files, and paste its `AGENTS-section.md` after the profile's.
 5. Fill in the Governance section of `AGENTS.md`: the profile, the pack revision you applied (`git -C /absolute/path/to/ai-starter-pack rev-parse --short HEAD`), the recipes, the risk triggers that apply and any overrides. Replace the `TODO` command line with scripts that actually exist in the new `package.json`.
 6. Adapt the target's root `README.md`, complete `docs/SPEC.md` and the profile's other documents, and write the first `docs/STATUS.md`. In an existing repository, reconcile any earlier project brief with `docs/SPEC.md` so there is one source of truth.
@@ -34,7 +34,7 @@ Every project gets the same core: one source of truth, facts marked confirmed or
 | MVP (planned) | Weeks to months of discovery and iteration. | Not yet available; use Production meanwhile. |
 | [Production](template/profiles/production/README.md) | Long-lived applications. | Full SPEC, design and decision records, milestones, independent CI before merge, one PR at a time. This is the pack as it was before profiles. |
 
-Risk is separate from the profile: the core's risk triggers (personal data, money, sign-in, real users, public reach) require their controls in any profile. A project's `AGENTS.md` records its profile, the risk triggers that apply and any overrides in its Governance section. A project without that section is treated as Production, so existing projects need no change.
+Risk is separate from the profile: the core's risk triggers (personal data, money, sign-in, real users, public reach) require their controls in any profile. A project's `AGENTS.md` records its profile, the risk triggers that apply and any overrides in its Governance section. A project without that section is treated as Production. Existing projects keep the files and pack revision they adopted. New Production setups get the new core rules on top of every earlier rule, and must copy the Production profile as well as `template/core/`; the [Production profile](template/profiles/production/README.md#compatibility-with-setups-from-before-profiles) explains the change.
 
 ## Git over SSH
 
@@ -120,6 +120,6 @@ More recipes can be added without making the core assume a framework or language
 - State each rule in one place. The README and bootstrap prompt point to recipes rather than restating their caveats.
 - Compare recipes with the documentation for the framework version actually installed in the target project.
 - Keep secrets, personal data, real customer examples and values from `.env` out of this potentially public pack.
-- CI checks every PR for broken relative links and anchors (`python3 scripts/check-links.py`), shellcheck on every `.sh` file and actionlint on the pack's and the recipes' workflows. Run the same commands locally before opening a PR.
+- CI checks every PR for broken relative links and anchors (`python3 scripts/check-links.py`, with its regression cases in `python3 scripts/test-check-links.py`), shellcheck on every `.sh` file and actionlint on the pack's and the recipes' workflows. Run the same commands locally before opening a PR.
 
 The core does not preselect a package manager, database, hosting provider, authentication system or testing framework. A recipe may make those choices for its own stack; confirm them for each new application.

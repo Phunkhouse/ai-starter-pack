@@ -1,6 +1,6 @@
 # Prompt for starting a project with an agent
 
-Copy this prompt into Claude Code or Codex while working in the **new target repository**. It sets up a Production project; for a time-boxed Sprint use the shorter prompt in the [Sprint profile](template/profiles/sprint/README.md#set-up-in-five-minutes) instead. Fill in the paths, a short description of the application and the recipe choices. The agent needs access to both locations. Recipe names are the directory names under `recipes/`; the [README's recipe table](README.md#recipes) says when each one fits.
+Copy this prompt into Claude Code or Codex while working in the **new target repository**. It sets up a Production project; for a time-boxed Sprint use the shorter prompt in the [Sprint profile](template/profiles/sprint/README.md#set-up) instead. Fill in the paths, a short description of the application and the recipe choices. The agent needs access to both locations. Recipe names are the directory names under `recipes/`; the [README's recipe table](README.md#recipes) says when each one fits.
 
 ```text
 I am starting a new application: <one to three sentences about its purpose and users>.

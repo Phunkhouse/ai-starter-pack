@@ -1,16 +1,16 @@
 # Status
 
-Rewritten, not appended, at the end of every session and after each finished step. Under one page; history lives in Git.
+Rewritten, not appended, at every handoff and whenever the state changes materially. Under one page; history lives in Git.
 
-Updated: <YYYY-MM-DD HH:MM> by <agent or person>
+Updated: <YYYY-MM-DD HH:MM time zone> by <agent or person>
 
 ## Goal
 
-<The current goal in one or two sentences, linked to SPEC or the milestone.>
+<The current goal in one or two sentences, with the acceptance criteria or milestone it serves, e.g. AC-2 in docs/SPEC.md.>
 
 ## State
 
-<What works now, what is in progress, and what is not started.>
+<What works now, what is in progress, and what is not started. Note scope changes since the last update, with their decision ids.>
 
 ## Next step
 
@@ -22,4 +22,8 @@ Updated: <YYYY-MM-DD HH:MM> by <agent or person>
 
 ## Last verified
 
-<Command, revision and result, e.g. `pnpm verify` on `abc1234`: passed. Checks not run and why.>
+- Command: <e.g. `pnpm verify`>
+- Revision: <short hash from `git rev-parse --short HEAD`>
+- Working tree: <clean | uncommitted changes in: files>
+- Result: <passed | failed: what>
+- Not run: <checks not run, and why>

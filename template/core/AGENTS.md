@@ -21,8 +21,8 @@
 
 ## Handover
 
-- Read `docs/STATUS.md` at the start of every session and after a context reset.
-- Before ending a session or after finishing a step, rewrite it, do not append: goal, current state, next step, blockers, last verified checks with revision. Keep it under one page; history lives in Git.
+- **Resume:** at the start of every session and after a context reset, read `docs/STATUS.md`, then the acceptance criteria and decisions in `docs/SPEC.md` that it names. Compare the current revision and working tree (`git diff --stat <verified revision>`, `git status --short`) with the state its last verification covered. If anything other than `docs/STATUS.md` changed, that verification is stale: say so and run the checks again before reporting anything as done. Uncommitted changes that `STATUS.md` does not describe are a disagreement: ask before building on them.
+- **Update** `docs/STATUS.md` at every handoff and whenever the state changes materially: a step finished, scope changed, a blocker appeared. Rewrite it, do not append: goal, current state, next step, blockers, and the last verification with its revision and working-tree state. Keep it under one page; history lives in Git.
 
 ## Commands
 
@@ -44,13 +44,13 @@
 
 These apply whatever the profile. Record the ones that apply under Governance.
 
-| When the project | It needs |
-| --- | --- |
-| Stores personal data | Only the data it needs, access checks on the server, no personal data in logs, seeds or tests. |
-| Handles money | Amounts computed on the server, idempotent operations, tests for rounding and failures. |
-| Has sign-in | Authorization checked on the server for every route, and tests that one user cannot reach another's data. |
-| Has real users | Backups with a tested restore, error monitoring and a rollback path. |
-| Is publicly reachable | Dependency and secret scanning, rate limits on endpoints open to abuse, security headers. |
+| When the project      | It needs                                                                                                  |
+| --------------------- | --------------------------------------------------------------------------------------------------------- |
+| Stores personal data  | Only the data it needs, access checks on the server, no personal data in logs, seeds or tests.            |
+| Handles money         | Amounts computed on the server, idempotent operations, tests for rounding and failures.                   |
+| Has sign-in           | Authorization checked on the server for every route, and tests that one user cannot reach another's data. |
+| Has real users        | Backups with a tested restore, error monitoring and a rollback path.                                      |
+| Is publicly reachable | Dependency and secret scanning, rate limits on endpoints open to abuse, security headers.                 |
 
 ## Git remote
 
