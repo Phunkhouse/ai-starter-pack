@@ -122,6 +122,7 @@ More recipes can be added without making the core assume a framework or language
 - Profiles only add to the core. A rule every project needs belongs in the core, never copied into each profile.
 - State each rule in one place. The README and bootstrap prompt point to recipes rather than restating their caveats.
 - Compare recipes with the documentation for the framework version actually installed in the target project.
+- Releases of the pack are annotated tags only: `git tag -a vX.Y.Z -m "vX.Y.Z: <theme>"` on a `main` commit whose CI passed, then `git push origin vX.Y.Z`. Do not create GitHub Releases. Tag or push only when the owner asks.
 - Keep secrets, personal data, real customer examples and values from `.env` out of this potentially public pack.
 - CI checks every PR for broken relative links and anchors (`python3 scripts/check-links.py`, with its regression cases in `python3 scripts/test-check-links.py`), that the Production profile keeps every pre-profile rule (`python3 scripts/check-production-parity.py`), the readiness checker's cases (`python3 scripts/test-check-readiness.py`), shellcheck on every `.sh` file and actionlint on the pack's and the recipes' workflows. Run the same commands locally before opening a PR.
 
