@@ -131,7 +131,10 @@ def check_approval(project: pathlib.Path, text: str, rows: dict[str, dict[str, s
     shown = git(project, "show", f"{commit}:docs/readiness.md")
     if shown.returncode != 0:
         return "stale", [f"approved commit {commit} not found, or it has no docs/readiness.md"], []
-    then, _ = gap_rows(shown.stdout)
+    then, then_errors = gap_rows(shown.stdout)
+    if then_errors:
+        # The owner approved something that is not a readable record; it cannot cover the current one.
+        return "stale", [f"docs/readiness.md at {commit} cannot be read as a record: {e}" for e in then_errors], []
     approved = set(then)
     for label, ids in (
         ("covered but not in the record now", covered - current),
