@@ -27,6 +27,11 @@ jobs:
           python3 scripts/test-check-links.py
           python3 scripts/check-links.py
 
+      - name: Production parity
+        run: |
+          python3 scripts/check-production-parity.py --self-test
+          python3 scripts/check-production-parity.py
+
       - name: Shell scripts
         run: git ls-files -z '*.sh' | xargs -0 shellcheck
 

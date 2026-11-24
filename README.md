@@ -56,22 +56,22 @@ Clone and add remotes with the alias, never with a plain `github.com` or HTTPS U
 
 ## Recipes
 
-Every recipe except the stack recipe is optional. Each README holds that recipe's conditions and caveats.
+Every recipe except the stack recipe is optional. Each README holds that recipe's conditions and caveats. The profile columns match each profile's README: **default** is part of that profile's setup, **offered** is proposed at setup, **when needed** is adopted when the "Use when" condition arises, and **—** is not used in that profile.
 
-| Recipe | Use when | Brings |
-| --- | --- | --- |
-| [Next.js full-stack](recipes/next-fullstack/README.md) | Stack recipe for a TypeScript Next.js app. | `files/`: CI workflow, ESLint, Prettier, `.nvmrc` |
-| [CI strategy](recipes/ci-strategy/README.md) | Always read at setup. Standard is the default; Budget-conscious skips draft PR jobs until the user approves ready for review. | `examples/`: budget workflows; `AGENTS-section.md` for Budget-conscious |
-| [Claude PR review](recipes/claude-pr-review/README.md) | You want on-demand `@claude review` comments on GitHub PRs. | `files/`: workflow |
-| [Playwright E2E](recipes/playwright-e2e/README.md) | The project has browser tests and needs to choose a CI environment for them. | `files/`: container workflow |
-| [Scalability and cost planning](recipes/scalability-planning/README.md) | Offered at setup by default; most useful when databases, uploads, paid APIs, jobs or reliability needs shape early decisions. | `AGENTS-section.md`; uses the external `audit-scalability-cost` skill |
-| [Legal planning](recipes/legal-planning/README.md) | After the first specification and before features, then a Pre-launch review. | `AGENTS-section.md`; uses the external `audit-legal-readiness` skill |
-| [Test and CI review](recipes/test-ci-review/README.md) | Real tests and CI exist and feedback is slow, costly or flaky. Not a bootstrap audit. | Uses the external `audit-test-ci` skill |
-| [CI execution performance](recipes/ci-performance/README.md) | Bounded worker, cache and duplicate-work improvements under either strategy. | Guidance and a measured [case study](recipes/ci-performance/case-study.md) |
-| [Self-hosted runner](recipes/self-hosted-runner/README.md) | A trusted private repository exhausts its included GitHub Actions minutes. | `examples/`: combined workflow |
-| [Vercel deployment budget](recipes/vercel-deployment-budget/README.md) | A Vercel project under Budget-conscious CI hits deployment limits. | Config fragment, after a preview-dependency review |
-| [Seed data](recipes/seed-data/README.md) | The project has a database: invented local data that shows every state and feature, with safety guards. | `examples/`, `AGENTS-section.md` |
-| [Vikunja task queue](recipes/vikunja-task-queue/README.md) | Ideas and findings arrive faster than they can be implemented, and you want a self-hosted owner/agent queue. | `examples/`, `AGENTS-section.md`, `task-sync` skill |
+| Recipe | Use when | Brings | Sprint | Production |
+| --- | --- | --- | --- | --- |
+| [Next.js full-stack](recipes/next-fullstack/README.md) | Stack recipe for a TypeScript Next.js app. | `files/`: CI workflow, ESLint, Prettier, `.nvmrc` | stack, without its CI step | stack |
+| [CI strategy](recipes/ci-strategy/README.md) | Read at every Production setup. Standard is the default; Budget-conscious skips draft PR jobs until the user approves ready for review. | `examples/`: budget workflows; `AGENTS-section.md` for Budget-conscious | — | default |
+| [Claude PR review](recipes/claude-pr-review/README.md) | You want on-demand `@claude review` comments on GitHub PRs. | `files/`: workflow | — | default |
+| [Playwright E2E](recipes/playwright-e2e/README.md) | The project has browser tests and needs to choose a CI environment for them. | `files/`: container workflow | when needed | when needed |
+| [Scalability and cost planning](recipes/scalability-planning/README.md) | Most useful when databases, uploads, paid APIs, jobs or reliability needs shape early decisions. | `AGENTS-section.md`; uses the external `audit-scalability-cost` skill | — | offered |
+| [Legal planning](recipes/legal-planning/README.md) | After the first specification and before features, then a Pre-launch review. | `AGENTS-section.md`; uses the external `audit-legal-readiness` skill | when needed | offered |
+| [Test and CI review](recipes/test-ci-review/README.md) | Real tests and CI exist and feedback is slow, costly or flaky. Not a bootstrap audit. | Uses the external `audit-test-ci` skill | — | when needed |
+| [CI execution performance](recipes/ci-performance/README.md) | Bounded worker, cache and duplicate-work improvements under either strategy. | Guidance and a measured [case study](recipes/ci-performance/case-study.md) | — | when needed |
+| [Self-hosted runner](recipes/self-hosted-runner/README.md) | A trusted private repository exhausts its included GitHub Actions minutes. | `examples/`: combined workflow | — | when needed |
+| [Vercel deployment budget](recipes/vercel-deployment-budget/README.md) | A Vercel project under Budget-conscious CI hits deployment limits. | Config fragment, after a preview-dependency review | — | when needed |
+| [Seed data](recipes/seed-data/README.md) | The project has a database: invented local data that shows every state and feature, with safety guards. | `examples/`, `AGENTS-section.md` | when needed | default once there is a database |
+| [Vikunja task queue](recipes/vikunja-task-queue/README.md) | Ideas and findings arrive faster than they can be implemented, and you want a self-hosted owner/agent queue. | `examples/`, `AGENTS-section.md`, `task-sync` skill | — | when needed |
 
 How recipes are packaged:
 
@@ -120,6 +120,6 @@ More recipes can be added without making the core assume a framework or language
 - State each rule in one place. The README and bootstrap prompt point to recipes rather than restating their caveats.
 - Compare recipes with the documentation for the framework version actually installed in the target project.
 - Keep secrets, personal data, real customer examples and values from `.env` out of this potentially public pack.
-- CI checks every PR for broken relative links and anchors (`python3 scripts/check-links.py`, with its regression cases in `python3 scripts/test-check-links.py`), shellcheck on every `.sh` file and actionlint on the pack's and the recipes' workflows. Run the same commands locally before opening a PR.
+- CI checks every PR for broken relative links and anchors (`python3 scripts/check-links.py`, with its regression cases in `python3 scripts/test-check-links.py`), that the Production profile keeps every pre-profile rule (`python3 scripts/check-production-parity.py`), shellcheck on every `.sh` file and actionlint on the pack's and the recipes' workflows. Run the same commands locally before opening a PR.
 
 The core does not preselect a package manager, database, hosting provider, authentication system or testing framework. A recipe may make those choices for its own stack; confirm them for each new application.
