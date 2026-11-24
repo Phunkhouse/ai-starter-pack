@@ -27,10 +27,12 @@ The tests written first, before implementation, for business logic and the criti
 
 ## Facts and assumptions
 
-| Statement             | Status     | Source                 |
-| --------------------- | ---------- | ---------------------- |
-| <Fact from the brief> | confirmed  | <brief, owner, date>   |
-| <Working assumption>  | assumption | <why it is reasonable> |
+Approval to proceed does not confirm an assumption. It stays `assumption` until the owner explicitly confirms the underlying fact or a reliable source verifies it; then it becomes `confirmed` with that source and the date.
+
+| Statement             | Status     | Source                           |
+| --------------------- | ---------- | -------------------------------- |
+| <Fact from the brief> | confirmed  | <source that confirmed it, date> |
+| <Working assumption>  | assumption | <why it is reasonable>           |
 
 ## Decision log
 
