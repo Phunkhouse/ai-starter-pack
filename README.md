@@ -4,23 +4,37 @@ A small, opinionated set of instructions and files for starting an application w
 
 ## Use it in a new repository
 
-To delegate these steps to an agent, use the [bootstrap prompt](BOOTSTRAP.md).
+To delegate these steps to an agent, use the [bootstrap prompt](BOOTSTRAP.md); for a Sprint, use the short prompt in the [Sprint profile](template/profiles/sprint/README.md#set-up-in-five-minutes).
 
-1. Create the new project with its official generator. For the current Next.js profile, choose TypeScript, the App Router, `src/`, pnpm and no Tailwind.
-2. Copy the shared files, including dotfiles, into the target repository:
+1. Choose a [governance profile](#governance-profiles).
+2. Create the new project with its official generator. For the current Next.js recipe, choose TypeScript, the App Router, `src/`, pnpm and no Tailwind.
+3. Copy the shared core and the profile's files, including dotfiles, into the target repository:
 
    ```sh
    rsync -a --ignore-existing /absolute/path/to/ai-starter-pack/template/core/ /absolute/path/to/new-project/
+   rsync -a --ignore-existing /absolute/path/to/ai-starter-pack/template/profiles/<profile>/files/ /absolute/path/to/new-project/
    ```
 
    `--ignore-existing` deliberately leaves existing files untouched, so **merge any file the generator already created by hand**. Next.js 16 generates its own `AGENTS.md`: keep its marked `nextjs-agent-rules` block (`next dev` re-adds it) and add the pack's `AGENTS.md` content below it. Compare the generator's `README.md` and ESLint config the same way.
-3. Choose a stack recipe and any optional recipes from the [table below](#recipes). Read each one before copying its files, and paste its `AGENTS-section.md` into the target `AGENTS.md` when it has one.
-4. Adapt the target's root `README.md`, complete `docs/SPEC.md` and `docs/design/`, and replace the `TODO` command line in `AGENTS.md` with scripts that actually exist in the new `package.json`. In an existing repository, reconcile any earlier project brief with `docs/SPEC.md` so there is one source of truth.
-5. Record the pack revision you applied (`git -C /absolute/path/to/ai-starter-pack rev-parse --short HEAD`) in the target's `docs/SPEC.md` under Technical approach, so later pack changes can be compared with what the project received.
-6. Set `origin` to the SSH URL with your host alias and record it in the Git remote section of `AGENTS.md` (see [Git over SSH](#git-over-ssh)).
-7. Install and configure the tools described by the selected recipes, run the relevant checks, then commit and push the resulting project.
+4. Paste the profile's `AGENTS-section.md` where the core `AGENTS.md` marks it. Choose a stack recipe and any optional recipes from the [table below](#recipes); read each one before copying its files, and paste its `AGENTS-section.md` after the profile's.
+5. Fill in the Governance section of `AGENTS.md`: the profile, the pack revision you applied (`git -C /absolute/path/to/ai-starter-pack rev-parse --short HEAD`), the recipes, the risk triggers that apply and any overrides. Replace the `TODO` command line with scripts that actually exist in the new `package.json`.
+6. Adapt the target's root `README.md`, complete `docs/SPEC.md` and the profile's other documents, and write the first `docs/STATUS.md`. In an existing repository, reconcile any earlier project brief with `docs/SPEC.md` so there is one source of truth.
+7. Set `origin` to the SSH URL with your host alias and record it in the Git remote section of `AGENTS.md` (see [Git over SSH](#git-over-ssh)).
+8. Install and configure the tools described by the selected recipes, run the relevant checks, then commit and push the resulting project.
 
-When development stages are agreed, copy the optional [milestone template](template/optional/docs/MILESTONES.md) into the target's `docs/` and replace its prompts with the actual plan. Each milestone needs observable acceptance checks, a way to verify them and completion evidence. A milestone can span several PRs, which still follow the one-at-a-time cadence.
+In a Production project, when development stages are agreed, copy the optional [milestone template](template/optional/docs/MILESTONES.md) into the target's `docs/` and replace its prompts with the actual plan. Each milestone needs observable acceptance checks, a way to verify them and completion evidence. A milestone can span several PRs, which still follow the one-at-a-time cadence.
+
+## Governance profiles
+
+Every project gets the same core: one source of truth, facts marked confirmed or assumed, a rewritten `docs/STATUS.md` for handover between sessions, scope and evidence rules, secret rules and risk triggers. A profile adds only the process the project's horizon needs.
+
+| Profile | For | Adds to the core |
+| --- | --- | --- |
+| [Sprint](template/profiles/sprint/README.md) | Hours to days: assignments, hackathons, prototypes. | Time box, short SPEC with a decision log, test-first core logic, one local verify command, README as a deliverable. |
+| MVP (planned) | Weeks to months of discovery and iteration. | Not yet available; use Production meanwhile. |
+| [Production](template/profiles/production/README.md) | Long-lived applications. | Full SPEC, design and decision records, milestones, independent CI before merge, one PR at a time. This is the pack as it was before profiles. |
+
+Risk is separate from the profile: the core's risk triggers (personal data, money, sign-in, real users, public reach) require their controls in any profile. A project's `AGENTS.md` records its profile, the risk triggers that apply and any overrides in its Governance section. A project without that section is treated as Production, so existing projects need no change.
 
 ## Git over SSH
 
@@ -89,7 +103,8 @@ For example, replace these placeholders with verified project details and choose
 
 | Location | Purpose |
 | --- | --- |
-| `template/core/` | Project README, specification, design and decision templates, agent instructions and EditorConfig. |
+| `template/core/` | Shared foundation for every profile: agent instructions, `CLAUDE.md`, the status template and EditorConfig. |
+| `template/profiles/` | One directory per profile: its `AGENTS-section.md`, its README and the `files/` it adds to the target. |
 | `template/optional/` | Milestone template to copy when development stages are agreed. |
 | `recipes/` | Stack and optional recipes, listed [above](#recipes). |
 | `BOOTSTRAP.md` | Prompt for applying the pack to a new repository with an agent. |
@@ -100,7 +115,8 @@ More recipes can be added without making the core assume a framework or language
 ## Maintenance principles
 
 - Agent instructions say **what** to do and **when**. Enforceable rules belong in configuration and CI. The reasons behind choices belong in decision records.
-- Try a general rule in a real project before adding it here. Keep `AGENTS.md` short, accurate and relevant to the task; put recipe-specific rules in that recipe's `AGENTS-section.md`.
+- Try a general rule in a real project before adding it here. Keep `AGENTS.md` short, accurate and relevant to the task; put profile-specific rules in the profile's `AGENTS-section.md` and recipe-specific rules in the recipe's.
+- Profiles only add to the core. A rule every project needs belongs in the core, never copied into each profile.
 - State each rule in one place. The README and bootstrap prompt point to recipes rather than restating their caveats.
 - Compare recipes with the documentation for the framework version actually installed in the target project.
 - Keep secrets, personal data, real customer examples and values from `.env` out of this potentially public pack.

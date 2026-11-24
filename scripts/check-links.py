@@ -1,9 +1,11 @@
 #!/usr/bin/env python3
 """Check relative Markdown links and in-repo heading anchors.
 
-External URLs are not fetched. A link in template/optional/ may point to a
-file that lives in template/core/ once both are copied into a target project,
-so those links also resolve against the matching template/core/ path.
+External URLs are not fetched. template/core/, template/optional/ and each
+template/profiles/<name>/files/ are copied into the same target project, so a
+link inside one of them may point to a file from another. A profile's files
+resolve against the core, optional and that profile; core and optional files
+resolve against any one profile.
 """
 import pathlib
 import re
@@ -25,14 +27,33 @@ def anchors(path: pathlib.Path) -> set[str]:
     return {slug(h) for h in HEADING.findall(FENCE.sub("", path.read_text()))}
 
 
+SHARED = [pathlib.Path("template", "core"), pathlib.Path("template", "optional")]
+PROFILES = sorted(pathlib.Path("template", "profiles").glob("*/files"))
+
+
+def target_trees(source: pathlib.Path) -> tuple[pathlib.Path, list[list[pathlib.Path]]] | None:
+    """The tree a template file sits in, and the tree sets it is copied with."""
+    for tree in SHARED + PROFILES:
+        if source.is_relative_to(tree):
+            if tree in PROFILES:
+                return tree, [SHARED + [tree]]
+            return tree, [SHARED + [profile] for profile in PROFILES]
+    return None
+
+
 def resolve(source: pathlib.Path, target: str) -> pathlib.Path | None:
-    candidates = [source.parent / target]
-    parts = source.parts
-    if parts[:2] == ("template", "optional"):
-        candidates.append(pathlib.Path("template", "core", *parts[2:]).parent / target)
-    for candidate in candidates:
-        if candidate.exists():
-            return candidate
+    direct = source.parent / target
+    if direct.exists():
+        return direct
+    found = target_trees(source)
+    if found is None:
+        return None
+    tree, combinations = found
+    inner = source.relative_to(tree).parent / target
+    for combination in combinations:
+        for root in combination:
+            if (root / inner).exists():
+                return root / inner
     return None
 
 
