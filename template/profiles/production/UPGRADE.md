@@ -6,7 +6,7 @@ It has three stages, each needing its own approval from the owner:
 
 1. **Preview:** read-only. Approving it means only "run the readiness stage".
 2. **Readiness:** the audits and the evidence checks write reports and a decision record. The profile stays MVP throughout.
-3. **Move:** only after the owner explicitly approves the move, recorded with a date, and only while no blocking gap is open.
+3. **Move:** only after the owner explicitly approves the move, recorded with a date, and only while no gap blocks it. A gap **blocks** the move while it is critical or high and not `fixed` or `accepted`. Medium and low gaps do not block, but every gap needs a decision before the owner is asked about the move.
 
 Give the agent this prompt:
 
@@ -20,7 +20,7 @@ Start with the preview and change nothing until I approve it.
 
 Decisions about gaps live in `docs/readiness.md`, a durable, shareable record that is committed with the project. `docs/STATUS.md` is rewritten at every handoff, so it only links the record and names the blockers open right now; it is never the place a decision is kept.
 
-The record has one row per gap: **id**, a shareable description, **severity** (critical, high, medium or low, from the audit or the agent's assessment), **decision**, **owner**, **date**, **reason**, and **evidence or backlog reference**. Use the audit finding id (`PRD-`, `SEC-`) where a finding exists, otherwise `RDY-NN`.
+The record has one row per gap: **id**, a shareable description, **severity** (critical, high, medium or low, from the audit or the agent's assessment), **decision**, **owner**, **date**, **reason**, and **evidence or backlog reference**. Use the audit finding id (`PRD-`, `SEC-`) where a finding exists, otherwise `RDY-NN`. Until a row is decided, its owner, date and reason are `—`. When the owner lowers a severity, the reason says so, for example "lowered from high by David: no deployment yet". A separate list, **Checks verified without a gap**, records evidence checks that passed or do not apply, with their evidence.
 
 Decisions and what each one means:
 
@@ -28,7 +28,7 @@ Decisions and what each one means:
 | --- | --- | --- |
 | `open` | Not decided yet | No |
 | `fixed` | Evidence shows it is fixed: a commit, test, run or document, linked | Yes |
-| `accepted` | The owner explicitly accepts the risk, with name, date and reason, where the project's rules allow that kind of acceptance | Yes |
+| `accepted` | The owner explicitly accepts the risk, with name, date and reason. Where the project's rules or agreements forbid accepting a kind of risk, it must be fixed instead; where they say nothing, the owner's explicit, dated acceptance is enough | Yes |
 | `backlog` | Deferred to a backlog item, with its reference | No: only medium and low gaps |
 
 The record ends with a **Move decision** line: `pending`, or `approved by <owner> on <YYYY-MM-DD>`.
@@ -46,7 +46,7 @@ Change nothing in this step: no file, no audit report, no setting.
 5. **Gap list.** If `docs/readiness.md` exists, start from its rows and their decisions; never reopen a recorded decision without new evidence. Add the gaps this preview finds, numbered `RDY-NN` after the last existing one. For each Readiness and Move step, report **present** (its check is already true), **gap** or **owner decision**.
 6. List the MVP rules the Production section would replace and where each project value would go. Nothing project-specific may be deleted.
 7. If the project's core `AGENTS.md` sections differ from the pack's current `template/core/AGENTS.md`, list the differences. Updating them is a separate owner decision, except the Governance section, which the Move stage needs.
-8. Ask the owner one question: run the readiness stage, including the audits? This approves reports and the record only, not the move.
+8. Ask the owner two questions: run the readiness stage, and run the audits within it? Both approve reports and the record only, not the move. In Confirm, skip this step.
 
 ## 2. Readiness
 
@@ -83,7 +83,7 @@ Run only when the record's Move decision line says approved and no critical or h
 
 Commit only approved project changes and shareable summaries:
 
-- **Included:** `AGENTS.md`, `docs/readiness.md`, `docs/STATUS.md`, and the milestone, runbook or SPEC changes the owner approved.
+- **Included:** `AGENTS.md`, `docs/readiness.md`, `docs/STATUS.md`, the backlog entries that `backlog` decisions point to, and the milestone, runbook or SPEC changes the owner approved.
 - **Never included:** audit reports or anything else the AI Audit Toolkit's handling rules keep private. In a public repository that means `docs/audits/` while security findings are unresolved.
 
 Before committing:
@@ -92,13 +92,13 @@ Before committing:
 
 Before opening the PR, check its description the same way. It gives the decision summary and links the record, never the reports. Sensitive evidence stays in its approved private location.
 
-Use `chore: upgrade to the Production profile` as the commit subject, through a PR when the project has a remote. A Readiness stage that ends at a blocker may commit `docs/readiness.md` and `docs/STATUS.md` alone, under the same checks, as `docs: record Production readiness decisions`.
+Use `chore: upgrade to the Production profile` as the commit subject, through a PR when the project has a remote. A Readiness stage that ends at a blocker commits only `docs/readiness.md`, `docs/STATUS.md` and the backlog entries its decisions point to, under the same checks, as `docs: record Production readiness decisions`.
 
 ## 4. Confirm
 
 Run the preview again. It reads decisions from `docs/readiness.md`, never from `docs/STATUS.md`, so a rewritten status cannot reopen an accepted gap or hide an open one.
 
 - **When the move was approved:** every Readiness and Move step must report present, apart from owner actions still pending.
-- **When the move is pending:** the profile must still be MVP, and the open blockers must match the record.
+- **When the move is pending:** the profile must still be MVP, and the blockers that `docs/STATUS.md` names must match the record's blocking rows. A later handoff may have rewritten `STATUS.md`; report the mismatch and, with the owner's approval, restore the link to the record and the current blockers.
 
 Report any difference as an incomplete or non-idempotent step.
