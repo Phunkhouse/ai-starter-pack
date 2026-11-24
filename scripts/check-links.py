@@ -1,9 +1,13 @@
 #!/usr/bin/env python3
 """Check relative Markdown links and in-repo heading anchors.
 
-External URLs are not fetched. A link in template/optional/ may point to a
-file that lives in template/core/ once both are copied into a target project,
-so those links also resolve against the matching template/core/ path.
+External URLs are not fetched. template/core/, template/optional/ and each
+template/profiles/<name>/files/ are copied into the same target project, so a
+link inside one of them may point to a file from another. A profile's own
+files must resolve in that profile's assembled target (core, optional and the
+profile). Shared core and optional files are copied into every profile, so
+their links must resolve in every assembled profile; a link that works in only
+some of them is reported once per profile where it breaks.
 """
 import pathlib
 import re
@@ -13,6 +17,7 @@ import sys
 LINK = re.compile(r"\]\(([^)\s]+)\)")
 FENCE = re.compile(r"^```.*?^```", re.M | re.S)
 HEADING = re.compile(r"^#{1,6} +(.+?) *#*$", re.M)
+SHARED = [pathlib.Path("template", "core"), pathlib.Path("template", "optional")]
 
 
 def slug(heading: str) -> str:
@@ -25,33 +30,67 @@ def anchors(path: pathlib.Path) -> set[str]:
     return {slug(h) for h in HEADING.findall(FENCE.sub("", path.read_text()))}
 
 
-def resolve(source: pathlib.Path, target: str) -> pathlib.Path | None:
-    candidates = [source.parent / target]
-    parts = source.parts
-    if parts[:2] == ("template", "optional"):
-        candidates.append(pathlib.Path("template", "core", *parts[2:]).parent / target)
-    for candidate in candidates:
-        if candidate.exists():
-            return candidate
+def profiles() -> list[pathlib.Path]:
+    return sorted(pathlib.Path("template", "profiles").glob("*/files"))
+
+
+def assemblies(source: pathlib.Path) -> tuple[pathlib.Path, list[tuple[str, list[pathlib.Path]]]] | None:
+    """The template tree a file sits in, and every assembled profile it is copied into."""
+    profile_trees = profiles()
+    for tree in profile_trees:
+        if source.is_relative_to(tree):
+            return tree, [(tree.parent.name, SHARED + [tree])]
+    for tree in SHARED:
+        if source.is_relative_to(tree):
+            return tree, [(profile.parent.name, SHARED + [profile]) for profile in profile_trees]
     return None
+
+
+def resolve_in(roots: list[pathlib.Path], inner: pathlib.Path) -> pathlib.Path | None:
+    for root in roots:
+        if (root / inner).exists():
+            return root / inner
+    return None
+
+
+def check_link(name: str, source: pathlib.Path, url: str) -> list[str]:
+    path, _, anchor = url.partition("#")
+    if not path:
+        targets = [(None, source)]
+    else:
+        direct = source.parent / path
+        found = assemblies(source)
+        if direct.exists() or found is None:
+            targets = [(None, direct if direct.exists() else None)]
+        else:
+            tree, combos = found
+            inner = source.relative_to(tree).parent / path
+            targets = [(profile, resolve_in(roots, inner)) for profile, roots in combos]
+    errors = []
+    for profile, target in targets:
+        where = f" (in the {profile} profile)" if profile else ""
+        if target is None:
+            errors.append(f"{name}: missing file {url}{where}")
+        elif anchor and target.suffix == ".md" and anchor not in anchors(target):
+            errors.append(f"{name}: missing anchor {url}{where}")
+    return errors
+
+
+def check(files: list[str]) -> list[str]:
+    errors = []
+    for name in files:
+        source = pathlib.Path(name)
+        for url in LINK.findall(FENCE.sub("", source.read_text())):
+            if not re.match(r"^[a-z][a-z0-9+.-]*:", url):
+                errors.extend(check_link(name, source, url))
+    return errors
 
 
 def main() -> int:
     files = subprocess.run(
         ["git", "ls-files", "*.md"], capture_output=True, text=True, check=True
     ).stdout.split()
-    errors = []
-    for name in files:
-        source = pathlib.Path(name)
-        for url in LINK.findall(FENCE.sub("", source.read_text())):
-            if re.match(r"^[a-z][a-z0-9+.-]*:", url):
-                continue
-            path, _, anchor = url.partition("#")
-            target = resolve(source, path) if path else source
-            if target is None:
-                errors.append(f"{name}: missing file {url}")
-            elif anchor and target.suffix == ".md" and anchor not in anchors(target):
-                errors.append(f"{name}: missing anchor {url}")
+    errors = check(files)
     for error in errors:
         print(error)
     print(f"Checked {len(files)} Markdown files: {len(errors)} broken links.")
