@@ -31,7 +31,7 @@ Decisions and what each one means:
 | `accepted` | The owner explicitly accepts the risk, with name, date and reason. Where the project's rules or agreements forbid accepting a kind of risk, it must be fixed instead; where they say nothing, the owner's explicit, dated acceptance is enough | Yes |
 | `backlog` | Deferred to a backlog item, with its reference | No: only medium and low gaps |
 
-The record ends with a **Move decision** line: `pending`, or `approved by <owner> on <YYYY-MM-DD> for the record as of <YYYY-MM-DD>, covering <ids>`. An approval covers exactly the readiness state the owner reviewed: the listed rows, each with the severity, decision and evidence it had on the "as of" date.
+The record ends with a **Move decision** line: `pending`, or `approved by <owner> on <YYYY-MM-DD> for the record at <commit>, covering <ids>`. `<commit>` is the commit of `docs/readiness.md` that the owner reviewed, so the record is committed before it is approved. An approval covers exactly that readiness state: the listed rows, each with the severity, decision and evidence it had in that commit. Compare with `git diff <commit> -- docs/readiness.md`; changes to the Move decision line and the Approval history alone do not count.
 
 - **What resets it:** a new gap, or a changed severity, decision or evidence on any row, makes that approval stale. Set the line back to `pending` and move the old line to an **Approval history** list below it. Rows that did not change keep their decisions.
 - **What keeps it:** a rerun that finds the same rows unchanged.
@@ -65,14 +65,14 @@ The profile stays MVP during this whole stage. Each step names its check; skip i
    _Present when_ each item is verified with evidence or has a row in the record.
 3. **Record.** Create or update `docs/readiness.md` with every gap from the preview, the audits and the evidence checks. Keep existing rows and their decisions; add only new ones. Set `Move decision: pending` if the line is missing. If this changes the readiness state an approval covers, reset the approval as [the readiness record](#the-readiness-record) describes. _Present when_ every known gap has a row, and the Move decision is `pending` or covers exactly the current rows.
 4. **Owner decisions.** Present the record to the owner and record each decision with owner, date and reason. Critical and high gaps resolve only as `fixed` with linked evidence, or `accepted` by the owner explicitly, with a date, where the project's rules allow it; `backlog` does not resolve them. Fixes are separate, focused changes outside this guide. _Present when_ every row has a decision other than `open`.
-5. **Readiness decision.** Stop while any critical or high gap is `open` or `backlog`. Report the blockers, rewrite `docs/STATUS.md` with a link to the record and the current blockers, and end. When nothing blocks and every row is decided, ask the owner whether to move to Production on the basis of the current record, as its own question. Record the answer on the Move decision line with the date, the record's date and the ids it covers. _Present when_ the Move decision line approves the current record.
+5. **Readiness decision.** Stop while any critical or high gap is `open` or `backlog`. Report the blockers, rewrite `docs/STATUS.md` with a link to the record and the current blockers, and end. When nothing blocks and every row is decided, ask the owner whether to move to Production on the basis of the current record, as its own question. Commit the record first, then record the answer on the Move decision line with the date, that commit and the ids it covers. _Present when_ the Move decision line approves the current record.
 
 ## 3. Move
 
 Run only when all of these hold; otherwise the profile stays MVP:
 - every current gap has a decision other than `open`;
 - no critical or high gap is unresolved;
-- the Move decision line approves the current record: it covers exactly the current rows, and none of them changed after the "as of" date.
+- the Move decision line approves the current record: it covers exactly the current rows, and none of them differs from the approved commit.
 
 1. **Governance.** Profile `Production (since YYYY-MM-DD)` with the pack revision. Keep the project's history, such as "MVP since …", when it is known; for a project that predates profiles, say so instead. Record approved overrides, such as agent merges, with their reason, and link `docs/readiness.md`. _Present when_ the Governance line says Production.
 2. **Profile section.** Make `AGENTS.md` contain every rule of the Production [AGENTS section](AGENTS-section.md). If it has an MVP section, replace it with the Production section. If its rules sit under earlier headings, as in a project that predates profiles, keep that layout unless the owner asks for a restructure, and add only the Production rules it lacks. Carry over:
