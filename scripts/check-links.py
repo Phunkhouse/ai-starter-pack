@@ -3,11 +3,11 @@
 
 External URLs are not fetched. template/core/, template/optional/ and each
 template/profiles/<name>/files/ are copied into the same target project, so a
-link inside one of them may point to a file from another. A profile's own
-files must resolve in that profile's assembled target (core, optional and the
-profile). Shared core and optional files are copied into every profile, so
-their links must resolve in every assembled profile; a link that works in only
-some of them is reported once per profile where it breaks.
+link inside one of them may point to a file from another. A profile's assembled
+target is the core, optional, the profile's own files and the files of every
+profile named in its `files-from` file (one name per line). Each file's links
+must resolve in every assembled target that receives the file; a link that
+works in only some of them is reported once per profile where it breaks.
 """
 import pathlib
 import re
@@ -34,15 +34,24 @@ def profiles() -> list[pathlib.Path]:
     return sorted(pathlib.Path("template", "profiles").glob("*/files"))
 
 
+def assembled() -> list[tuple[str, list[pathlib.Path]]]:
+    """Every profile's assembled target: shared trees, its files and those of files-from."""
+    result = []
+    for files in profiles():
+        roots = SHARED + [files]
+        extra = files.parent / "files-from"
+        if extra.exists():
+            for name in extra.read_text().split():
+                roots.append(pathlib.Path("template", "profiles", name, "files"))
+        result.append((files.parent.name, roots))
+    return result
+
+
 def assemblies(source: pathlib.Path) -> tuple[pathlib.Path, list[tuple[str, list[pathlib.Path]]]] | None:
-    """The template tree a file sits in, and every assembled profile it is copied into."""
-    profile_trees = profiles()
-    for tree in profile_trees:
+    """The template tree a file sits in, and every assembled target that receives it."""
+    for tree in SHARED + profiles():
         if source.is_relative_to(tree):
-            return tree, [(tree.parent.name, SHARED + [tree])]
-    for tree in SHARED:
-        if source.is_relative_to(tree):
-            return tree, [(profile.parent.name, SHARED + [profile]) for profile in profile_trees]
+            return tree, [(name, roots) for name, roots in assembled() if tree in roots]
     return None
 
 

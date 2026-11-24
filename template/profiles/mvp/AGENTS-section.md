@@ -1,0 +1,12 @@
+## MVP profile
+
+- **Further sources of truth:** assumptions and hypotheses in `docs/assumptions.md`; decisions that constrain future work in `docs/decisions/`; approved design, when there is a UI, in `docs/design/`; deployment and operations in `docs/runbook.md`; the backlog in `<docs/BACKLOG.md | the Vikunja queue | GitHub issues>`, its only home.
+- **Hypotheses:** every open assumption in the register says how it gets confirmed: by whom or by what evidence. Build on it as written. When it is confirmed or disproved, update the register and the rules and tests that depend on it in the same change.
+- **Scope:** the owner prioritizes the backlog and decides what comes next. Work found along the way is proposed for the backlog, not built.
+- **Decisions:** write a decision record when a choice constrains future work or is costly to reverse, such as the data model, platform, sign-in or an external service. Explain other meaningful choices in the PR description.
+- **Architecture:** keep business rules separate from route handlers and UI components, with validation and trust-boundary checks on the server, so the product can mature without a rewrite. Do not add layers, services or infrastructure for scale the product has not reached.
+- **Tests:** test by risk: business rules, trust boundaries and data integrity at the lowest useful level, real database integration tests for transactions, and a few end-to-end tests for the flows users depend on. Never add placeholder tests.
+- **Checks and CI:** `<verify command>` runs `<format:check, lint, typecheck, test and build>` locally and changes no files; once tests exist, it includes them. CI strategy: `<Standard | Budget-conscious>`, from the starter pack's CI strategy recipe. Independent CI on the current revision must pass before merge.
+- **Pull requests:** one focused PR at a time, reviewed by the owner. Merge: `<the owner merges | the agent may merge once CI passes and the owner has approved>`. When a PR needs owner actions, such as a migration, a secret or a step on another machine, put them in an `> [!IMPORTANT]` block at the top of the description and repeat them in chat.
+- **Deploy:** repeatable and written down in `docs/runbook.md`: how to deploy and roll back, and, once there is real data, how to back up and restore.
+- **Toward Production:** when paying users, personal data at scale, a second regular contributor or availability commitments arrive, tell the owner. A readiness review decides whether the project moves to Production.

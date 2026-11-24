@@ -15,6 +15,8 @@ To delegate these steps to an agent, use the [bootstrap prompt](BOOTSTRAP.md); f
    rsync -a --ignore-existing /absolute/path/to/ai-starter-pack/template/profiles/<profile>/files/ /absolute/path/to/new-project/
    ```
 
+   If the profile has a `files-from` file, also copy the `files/` of each profile it names. MVP names Production, whose document templates it uses.
+
    Both copies are needed: `template/core/` alone is no longer a complete project, because the README, SPEC, design and decision templates moved into the profiles. `--ignore-existing` deliberately leaves existing files untouched, so **merge any file the generator already created by hand**. Next.js 16 generates its own `AGENTS.md`: keep its marked `nextjs-agent-rules` block (`next dev` re-adds it) and add the pack's `AGENTS.md` content below it. Compare the generator's `README.md` and ESLint config the same way.
 4. Paste the profile's `AGENTS-section.md` where the core `AGENTS.md` marks it. Choose a stack recipe and any optional recipes from the [table below](#recipes); read each one before copying its files, and paste its `AGENTS-section.md` after the profile's.
 5. Fill in the Governance section of `AGENTS.md`: the profile, the pack revision you applied (`git -C /absolute/path/to/ai-starter-pack rev-parse --short HEAD`), the recipes, the risk triggers that apply and any overrides. Replace the `TODO` command line with scripts that actually exist in the new `package.json`.
@@ -31,7 +33,7 @@ Every project gets the same core: one source of truth, facts marked confirmed or
 | Profile | For | Adds to the core |
 | --- | --- | --- |
 | [Sprint](template/profiles/sprint/README.md) | Hours to days: assignments, hackathons, prototypes. | Time box, short SPEC with a decision log, test-first core logic, one local verify command, README as a deliverable. |
-| MVP (planned) | Weeks to months of discovery and iteration. | Not yet available; use Production meanwhile. |
+| [MVP](template/profiles/mvp/README.md) | Weeks to months of discovery and iteration. | Assumptions register with how each gets confirmed, one backlog, decision records for hard-to-reverse choices, risk-based tests, independent CI before merge, a written deploy. A Sprint project moves here with the [upgrade guide](template/profiles/mvp/UPGRADE.md). |
 | [Production](template/profiles/production/README.md) | Long-lived applications. | Full SPEC, design and decision records, milestones, independent CI before merge, one PR at a time. This is the pack as it was before profiles. |
 
 Risk is separate from the profile: the core's risk triggers (personal data, money, sign-in, real users, public reach) require their controls in any profile. A project's `AGENTS.md` records its profile, the risk triggers that apply and any overrides in its Governance section. A project without that section is treated as Production. Existing projects keep the files and pack revision they adopted. New Production setups get the new core rules on top of every earlier rule, and must copy the Production profile as well as `template/core/`; the [Production profile](template/profiles/production/README.md#compatibility-with-setups-from-before-profiles) explains the change.
@@ -56,22 +58,22 @@ Clone and add remotes with the alias, never with a plain `github.com` or HTTPS U
 
 ## Recipes
 
-Every recipe except the stack recipe is optional. Each README holds that recipe's conditions and caveats. The profile columns match each profile's README: **default** is part of that profile's setup, **offered** is proposed at the stated moment, **opt-in** is set up only when the owner selects it in the bootstrap prompt, **when needed** is adopted when the "Use when" condition arises, and **—** is not used in that profile.
+Every recipe except the stack recipe is optional. Each README holds that recipe's conditions and caveats. The profile columns match each profile's README; MVP and Production use recipes the same way and differ in process: **default** is part of that profile's setup, **offered** is proposed at the stated moment, **opt-in** is set up only when the owner selects it in the bootstrap prompt, **when needed** is adopted when the "Use when" condition arises, and **—** is not used in that profile.
 
-| Recipe | Use when | Brings | Sprint | Production |
-| --- | --- | --- | --- | --- |
-| [Next.js full-stack](recipes/next-fullstack/README.md) | Stack recipe for a TypeScript Next.js app. | `files/`: CI workflow, ESLint, Prettier, `.nvmrc` | stack, without its CI step | stack |
-| [CI strategy](recipes/ci-strategy/README.md) | Read at every Production setup. Standard is the default; Budget-conscious skips draft PR jobs until the user approves ready for review. | `examples/`: budget workflows; `AGENTS-section.md` for Budget-conscious | — | default |
-| [Claude PR review](recipes/claude-pr-review/README.md) | You want on-demand `@claude review` comments on GitHub PRs. | `files/`: workflow | — | opt-in |
-| [Playwright E2E](recipes/playwright-e2e/README.md) | The project has browser tests and needs to choose a CI environment for them. | `files/`: container workflow | when needed | when needed |
-| [Scalability and cost planning](recipes/scalability-planning/README.md) | Most useful when databases, uploads, paid APIs, jobs or reliability needs shape early decisions. | `AGENTS-section.md`; uses the external `audit-scalability-cost` skill | — | offered at setup |
-| [Legal planning](recipes/legal-planning/README.md) | After the first specification and before features, then a Pre-launch review. | `AGENTS-section.md`; uses the external `audit-legal-readiness` skill | when needed | offered at setup |
-| [Test and CI review](recipes/test-ci-review/README.md) | Real tests and CI exist and feedback is slow, costly or flaky. Not a bootstrap audit. | Uses the external `audit-test-ci` skill | — | when needed |
-| [CI execution performance](recipes/ci-performance/README.md) | Bounded worker, cache and duplicate-work improvements under either strategy. | Guidance and a measured [case study](recipes/ci-performance/case-study.md) | — | when needed |
-| [Self-hosted runner](recipes/self-hosted-runner/README.md) | A trusted private repository exhausts its included GitHub Actions minutes. | `examples/`: combined workflow | — | when needed |
-| [Vercel deployment budget](recipes/vercel-deployment-budget/README.md) | A Vercel project under Budget-conscious CI hits deployment limits. | Config fragment, after a preview-dependency review | — | when needed |
-| [Seed data](recipes/seed-data/README.md) | The project has a database: invented local data that shows every state and feature, with safety guards. | `examples/`, `AGENTS-section.md` | when needed | offered with the first database migration |
-| [Vikunja task queue](recipes/vikunja-task-queue/README.md) | Ideas and findings arrive faster than they can be implemented, and you want a self-hosted owner/agent queue. | `examples/`, `AGENTS-section.md`, `task-sync` skill | — | when needed |
+| Recipe | Use when | Brings | Sprint | MVP | Production |
+| --- | --- | --- | --- | --- | --- |
+| [Next.js full-stack](recipes/next-fullstack/README.md) | Stack recipe for a TypeScript Next.js app. | `files/`: CI workflow, ESLint, Prettier, `.nvmrc` | stack, without its CI step | stack | stack |
+| [CI strategy](recipes/ci-strategy/README.md) | Read at every Production setup. Standard is the default; Budget-conscious skips draft PR jobs until the user approves ready for review. | `examples/`: budget workflows; `AGENTS-section.md` for Budget-conscious | — | default | default |
+| [Claude PR review](recipes/claude-pr-review/README.md) | You want on-demand `@claude review` comments on GitHub PRs. | `files/`: workflow | — | opt-in | opt-in |
+| [Playwright E2E](recipes/playwright-e2e/README.md) | The project has browser tests and needs to choose a CI environment for them. | `files/`: container workflow | when needed | when needed | when needed |
+| [Scalability and cost planning](recipes/scalability-planning/README.md) | Most useful when databases, uploads, paid APIs, jobs or reliability needs shape early decisions. | `AGENTS-section.md`; uses the external `audit-scalability-cost` skill | — | offered at setup | offered at setup |
+| [Legal planning](recipes/legal-planning/README.md) | After the first specification and before features, then a Pre-launch review. | `AGENTS-section.md`; uses the external `audit-legal-readiness` skill | when needed | offered at setup | offered at setup |
+| [Test and CI review](recipes/test-ci-review/README.md) | Real tests and CI exist and feedback is slow, costly or flaky. Not a bootstrap audit. | Uses the external `audit-test-ci` skill | — | when needed | when needed |
+| [CI execution performance](recipes/ci-performance/README.md) | Bounded worker, cache and duplicate-work improvements under either strategy. | Guidance and a measured [case study](recipes/ci-performance/case-study.md) | — | when needed | when needed |
+| [Self-hosted runner](recipes/self-hosted-runner/README.md) | A trusted private repository exhausts its included GitHub Actions minutes. | `examples/`: combined workflow | — | when needed | when needed |
+| [Vercel deployment budget](recipes/vercel-deployment-budget/README.md) | A Vercel project under Budget-conscious CI hits deployment limits. | Config fragment, after a preview-dependency review | — | when needed | when needed |
+| [Seed data](recipes/seed-data/README.md) | The project has a database: invented local data that shows every state and feature, with safety guards. | `examples/`, `AGENTS-section.md` | when needed | offered with the first database migration | offered with the first database migration |
+| [Vikunja task queue](recipes/vikunja-task-queue/README.md) | Ideas and findings arrive faster than they can be implemented, and you want a self-hosted owner/agent queue. | `examples/`, `AGENTS-section.md`, `task-sync` skill | — | when needed | when needed |
 
 How recipes are packaged:
 
