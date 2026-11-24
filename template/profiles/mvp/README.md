@@ -30,4 +30,4 @@ A Sprint project that keeps going follows the [upgrade guide](UPGRADE.md) instea
 
 ## When it is ready for Production
 
-Signs: paying users, personal data at scale, a second regular contributor, or availability commitments. The readiness review then lists what Production still needs, and the owner decides. Moving to Production adds rules; it does not reset the project.
+Signs: paying users, personal data at scale, a second regular contributor, or availability commitments. The readiness review then lists what Production still needs, and the owner decides. The [Production upgrade guide](../production/UPGRADE.md) runs that review and the move. It adds rules; it does not reset the project.
