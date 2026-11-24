@@ -36,6 +36,14 @@ After the gap rows comes the **Move decision** line, followed by an **Approval h
 - **What resets it:** a new gap, or a changed severity, decision or evidence on any row, makes that approval stale. Set the line back to `pending` and move the old line to the Approval history with the reason it went stale. Rows that did not change keep their decisions. Refreshing a recorded revision or date while the observed state stays the same is not a change.
 - **What keeps it:** a rerun that finds the same rows unchanged.
 
+The pack's `scripts/check-readiness.py` reports the record's mechanical state, read-only: run `python3 <pack>/scripts/check-readiness.py <project>`. It checks:
+- rows with an unknown severity or decision, or a decision missing its owner, date, reason or reference;
+- blocking and undecided gaps;
+- whether the approval names an existing commit, covers exactly the current rows, and none of them changed since;
+- whether `docs/STATUS.md` links the record and names every blocker.
+
+It reads only the record, so finding new gaps stays the preview's job, and its output is evidence: the rules in this guide decide.
+
 Write shareable wording only. Audit reports themselves omit credentials and personal data and redact other sensitive details, such as exploit steps. Evidence that must be kept is stored redacted in the approved private location: as the AI Audit Toolkit's handling rules say, in a public repository `docs/audits/` stays private or ignored until the fixes are in place. The committed record refers to private findings by id only.
 
 ## 1. Preview
@@ -69,7 +77,7 @@ The profile stays MVP during this whole stage. Each step names its check; skip i
 
 ## 3. Move
 
-Run only when all of these hold; otherwise the profile stays MVP:
+Run only when all of these hold, which `scripts/check-readiness.py` reports as "Move conditions: met"; otherwise the profile stays MVP:
 - every current gap has a decision other than `open`;
 - no critical or high gap is unresolved;
 - the Move decision line approves the current record: it covers exactly the current rows, and none of them differs from the approved commit.
@@ -102,7 +110,7 @@ Use `chore: upgrade to the Production profile` as the commit subject, through a 
 
 ## 4. Confirm
 
-Run the preview again. It reads decisions from `docs/readiness.md`, never from `docs/STATUS.md`, so a rewritten status cannot reopen an accepted gap or hide an open one.
+Run the preview again, together with `scripts/check-readiness.py`. It reads decisions from `docs/readiness.md`, never from `docs/STATUS.md`, so a rewritten status cannot reopen an accepted gap or hide an open one.
 
 - **When the move was approved:** every Readiness and Move step must report present, apart from owner actions still pending.
 - **When the move is pending:** the profile must still be MVP, and the blockers that `docs/STATUS.md` names must match the record's blocking rows. A later handoff may have rewritten `STATUS.md`; report the mismatch and, with the owner's approval, restore the link to the record and the current blockers.

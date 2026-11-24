@@ -27,6 +27,9 @@ jobs:
           python3 scripts/test-check-links.py
           python3 scripts/check-links.py
 
+      - name: Readiness checker
+        run: python3 scripts/test-check-readiness.py
+
       - name: Production parity
         run: |
           python3 scripts/check-production-parity.py --self-test

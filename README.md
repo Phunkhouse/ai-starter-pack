@@ -110,7 +110,7 @@ For example, replace these placeholders with verified project details and choose
 | `template/optional/` | Milestone template to copy when development stages are agreed. |
 | `recipes/` | Stack and optional recipes, listed [above](#recipes). |
 | `BOOTSTRAP.md` | Prompt for applying the pack to a new repository with an agent. |
-| `scripts/`, `.github/` | The pack's own checks; not copied into target projects. |
+| `scripts/`, `.github/` | The pack's own checks, not copied into target projects, plus `check-readiness.py`, which the Production upgrade guide runs against a project. |
 
 More recipes can be added without making the core assume a framework or language. In particular, the Next.js ESLint config and Prettier preferences belong to its recipe, not to the core.
 
@@ -122,6 +122,6 @@ More recipes can be added without making the core assume a framework or language
 - State each rule in one place. The README and bootstrap prompt point to recipes rather than restating their caveats.
 - Compare recipes with the documentation for the framework version actually installed in the target project.
 - Keep secrets, personal data, real customer examples and values from `.env` out of this potentially public pack.
-- CI checks every PR for broken relative links and anchors (`python3 scripts/check-links.py`, with its regression cases in `python3 scripts/test-check-links.py`), that the Production profile keeps every pre-profile rule (`python3 scripts/check-production-parity.py`), shellcheck on every `.sh` file and actionlint on the pack's and the recipes' workflows. Run the same commands locally before opening a PR.
+- CI checks every PR for broken relative links and anchors (`python3 scripts/check-links.py`, with its regression cases in `python3 scripts/test-check-links.py`), that the Production profile keeps every pre-profile rule (`python3 scripts/check-production-parity.py`), the readiness checker's cases (`python3 scripts/test-check-readiness.py`), shellcheck on every `.sh` file and actionlint on the pack's and the recipes' workflows. Run the same commands locally before opening a PR.
 
 The core does not preselect a package manager, database, hosting provider, authentication system or testing framework. A recipe may make those choices for its own stack; confirm them for each new application.
