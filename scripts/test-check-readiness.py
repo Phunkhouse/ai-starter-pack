@@ -17,7 +17,10 @@ def record(rows: dict[str, str], move: str, intro: str = "Assessed on 2026-11-24
     return f"# Production readiness record\n\n{intro}\n\n## Gaps\n\n{HEADER}" + "\n".join(rows.values()) + f"\n\nMove decision: {move}\n"
 
 
-def run(steps: list[dict[str, str]], status: str = "Blockers: none. See [record](readiness.md).") -> tuple[int, str]:
+GOOD_STATUS = "# Status\n\nReadiness: [record](readiness.md).\n\n## Blockers and open questions\n\n- RDY-01: audits not run.\n"
+
+
+def run(steps: list[dict[str, str]], status: str = GOOD_STATUS) -> tuple[int, str]:
     """Commit each step's files in turn, then run the checker on the last state."""
     with tempfile.TemporaryDirectory() as tmp:
         root = pathlib.Path(tmp)
@@ -45,7 +48,7 @@ CASES = [
     ("a row added after the approval makes it stale",
      [{R: record(ROWS, "pending")}, {R: record(ROWS, APPROVE)},
       {R: record({**ROWS, "RDY-03": "| RDY-03 | Assumption unconfirmed | medium | open | — | — | — | — |"}, "approved by Owner on 2026-11-24 for the record at {prev}, covering RDY-01, RDY-02")}],
-     0, ["Move decision: stale", "approval does not cover RDY-03", "Undecided: RDY-03"]),
+     0, ["Move decision: stale", "rows in the record now but not covered: RDY-03", "rows added since", "Undecided: RDY-03"]),
     ("a decision changed after the approval makes it stale",
      [{R: record(ROWS, "pending")}, {R: record(ROWS, APPROVE)},
       {R: record({**ROWS, "RDY-02": ROWS["RDY-02"].replace("No deployment", "Changed reason")}, "approved by Owner on 2026-11-24 for the record at {prev}, covering RDY-01, RDY-02")}],
@@ -68,9 +71,23 @@ CASES = [
     ("an approval naming a missing commit is stale",
      [{R: record(ROWS, "approved by Owner on 2026-11-24 for the record at 0000000, covering RDY-01, RDY-02")}],
      0, ["Move decision: stale", "approved commit 0000000 not found"]),
-    ("STATUS without the record link or a blocker is reported",
+    ("STATUS without a link, saying no blockers and naming only RDY-010, is reported",
      [{R: record({**ROWS, "RDY-01": "| RDY-01 | Audits not run | high | open | — | — | — | — |"}, "pending")}],
-     0, ["warning: docs/STATUS.md does not link docs/readiness.md", "does not name blocking gaps RDY-01"]),
+     0, ["warning: docs/STATUS.md has no Markdown link to docs/readiness.md", "blockers section does not name RDY-01"],
+     "# Status\n\nBlockers: none.\n\nSee readiness.md for the record.\n\n## History\n\n- RDY-010 archived on 2026-11-20.\n"),
+    ("a removed row with covering edited to match keeps the approval stale",
+     [{R: record(ROWS, "pending")},
+      {R: record({"RDY-01": ROWS["RDY-01"]}, "approved by Owner on 2026-11-24 for the record at {prev}, covering RDY-01")}],
+     0, ["Move decision: stale", "removed since", "in ", "but not covered: RDY-02", "Move conditions: not met"]),
+    ("an empty gap table approved as covering none meets the Move conditions",
+     [{R: record({}, "pending")}, {R: record({}, "approved by Owner on 2026-11-24 for the record at {prev}, covering none")}],
+     0, ["Gaps: 0 (none)", "Move decision: approved", "Move conditions: met"]),
+    ("a missing Move decision line is an error",
+     [{R: record(ROWS, "pending").replace("Move decision: pending\n", "")}],
+     1, ["error: no Move decision line", "Move conditions: not met"]),
+    ("an unreadable Move decision is an error",
+     [{R: record(ROWS, "yes")}],
+     1, ["error: Move decision line not in the guide's format: 'Move decision: yes'", "Move conditions: not met"]),
     ("no record exits 2",
      [{"docs/other.md": "nothing"}],
      2, ["No docs/readiness.md"]),
@@ -79,9 +96,9 @@ CASES = [
 
 def main() -> int:
     failures = 0
-    for title, steps, code, expected in CASES:
-        status = "Blockers: none." if "STATUS without" in title else "Blockers: none. See [record](readiness.md). RDY-01"
-        got_code, out = run(steps, status)
+    for case in CASES:
+        title, steps, code, expected = case[:4]
+        got_code, out = run(steps, case[4] if len(case) > 4 else GOOD_STATUS)
         missing = [e for e in expected if e not in out]
         ok = got_code == code and not missing
         failures += not ok

@@ -12,13 +12,16 @@ to know:
   date, reason or reference;
 - gaps that block the move (critical or high, not fixed or accepted) and gaps
   still open;
-- whether the approval names a commit that exists, covers exactly the current
-  rows, and none of those rows differs from that commit;
-- whether docs/STATUS.md links the record and names every blocker.
+- whether the approval names a commit that exists, and the ids it covers, the
+  current ids and the ids in that commit are the same set, with every row
+  unchanged (`covering none` is the empty set);
+- whether docs/STATUS.md has a Markdown link to the record and names every
+  blocking gap, by exact id, in its blockers section.
 
 It changes nothing. The guide's rules decide; this script only gathers the
-mechanical facts. Exit status: 0 when the record is well formed, 1 when it has
-errors, 2 when there is no record.
+mechanical facts. Exit status: 0 when the record is well formed, even if the
+Move conditions are not met; 1 when it has errors, including a missing or
+unreadable Move decision line; 2 when there is no record.
 """
 import pathlib
 import re
@@ -105,37 +108,62 @@ def git(project: pathlib.Path, *args: str) -> subprocess.CompletedProcess:
     return subprocess.run(["git", "-C", str(project), *args], capture_output=True, text=True)
 
 
-def check_approval(project: pathlib.Path, text: str, rows: dict[str, dict[str, str]]) -> tuple[str, list[str]]:
-    """Return the approval state and the reasons it is not valid."""
+def covered_ids(text: str) -> set[str]:
+    text = text.strip()
+    if text.lower() == "none":
+        return set()
+    return {i.strip() for i in text.replace(" and ", ",").split(",") if i.strip()}
+
+
+def check_approval(project: pathlib.Path, text: str, rows: dict[str, dict[str, str]]) -> tuple[str, list[str], list[str]]:
+    """Return the approval state, why it is stale, and format errors."""
     line = next((l for l in text.splitlines() if l.startswith("Move decision:")), None)
     if line is None:
-        return "missing", ["no Move decision line"]
+        return "missing", [], ["no Move decision line"]
     if PENDING.match(line):
-        return "pending", []
+        return "pending", [], []
     match = APPROVED.match(line)
     if not match:
-        return "unreadable", [f"Move decision line not in the guide's format: {line!r}"]
+        return "unreadable", [], [f"Move decision line not in the guide's format: {line!r}"]
     reasons = []
     commit = match["commit"]
-    covered = {i.strip() for i in match["ids"].replace(" and ", ",").split(",") if i.strip()}
-    if covered != set(rows):
-        missing, extra = sorted(set(rows) - covered), sorted(covered - set(rows))
-        if missing:
-            reasons.append(f"approval does not cover {', '.join(missing)}")
-        if extra:
-            reasons.append(f"approval covers rows that no longer exist: {', '.join(extra)}")
+    covered, current = covered_ids(match["ids"]), set(rows)
     shown = git(project, "show", f"{commit}:docs/readiness.md")
     if shown.returncode != 0:
-        reasons.append(f"approved commit {commit} not found, or it has no docs/readiness.md")
-    else:
-        then, _ = gap_rows(shown.stdout)
-        changed = sorted(rid for rid in rows if rid in then and then[rid] != rows[rid])
-        added = sorted(rid for rid in rows if rid not in then)
-        if changed:
-            reasons.append(f"rows changed since {commit}: {', '.join(changed)}")
-        if added:
-            reasons.append(f"rows added since {commit}: {', '.join(added)}")
-    return ("approved" if not reasons else "stale"), reasons
+        return "stale", [f"approved commit {commit} not found, or it has no docs/readiness.md"], []
+    then, _ = gap_rows(shown.stdout)
+    approved = set(then)
+    for label, ids in (
+        ("covered but not in the record now", covered - current),
+        ("in the record now but not covered", current - covered),
+        (f"covered but not in {commit}", covered - approved),
+        (f"in {commit} but not covered", approved - covered),
+        (f"added since {commit}", current - approved),
+        (f"removed since {commit}", approved - current),
+    ):
+        if ids:
+            reasons.append(f"rows {label}: {', '.join(sorted(ids))}")
+    changed = sorted(rid for rid in current & approved if then[rid] != rows[rid])
+    if changed:
+        reasons.append(f"rows changed since {commit}: {', '.join(changed)}")
+    return ("approved" if not reasons else "stale"), reasons, []
+
+
+LINK = re.compile(r"\[[^\]]*\]\([^)\s]*readiness\.md(?:#[^)\s]*)?\)")
+
+
+def blockers_section(text: str) -> str:
+    """The current blockers: the section under a heading that names blockers, or a "Blockers:" line."""
+    lines = text.splitlines()
+    for i, line in enumerate(lines):
+        if re.match(r"^#{1,6}\s.*\bblockers?\b", line, re.I):
+            body = []
+            for following in lines[i + 1:]:
+                if re.match(r"^#{1,6}\s", following):
+                    break
+                body.append(following)
+            return "\n".join(body)
+    return "\n".join(l for l in lines if re.match(r"^\s*[-*]?\s*\**blockers?\**\s*:", l, re.I))
 
 
 def check_status(project: pathlib.Path, blocking: list[str]) -> list[str]:
@@ -144,11 +172,14 @@ def check_status(project: pathlib.Path, blocking: list[str]) -> list[str]:
         return ["docs/STATUS.md is missing"]
     text = path.read_text()
     warnings = []
-    if "readiness.md" not in text:
-        warnings.append("docs/STATUS.md does not link docs/readiness.md")
-    missing = [rid for rid in blocking if rid not in text]
+    if not LINK.search(text):
+        warnings.append("docs/STATUS.md has no Markdown link to docs/readiness.md")
+    section = blockers_section(text)
+    if blocking and not section:
+        warnings.append("docs/STATUS.md has no blockers section")
+    missing = [rid for rid in blocking if not re.search(rf"(?<![\w-]){re.escape(rid)}(?![\w-])", section)]
     if missing:
-        warnings.append(f"docs/STATUS.md does not name blocking gaps {', '.join(missing)}")
+        warnings.append(f"docs/STATUS.md blockers section does not name {', '.join(missing)}")
     return warnings
 
 
@@ -167,7 +198,8 @@ def main() -> int:
     rows, errors = gap_rows(text)
     row_errors, blocking, undecided = check_rows(rows)
     errors += row_errors
-    approval, stale = check_approval(project, text, rows)
+    approval, stale, format_errors = check_approval(project, text, rows)
+    errors += format_errors
     warnings = check_status(project, blocking)
 
     print(f"Gaps: {len(rows)} ({', '.join(rows) or 'none'})")
