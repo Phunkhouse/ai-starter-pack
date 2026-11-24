@@ -56,21 +56,21 @@ Clone and add remotes with the alias, never with a plain `github.com` or HTTPS U
 
 ## Recipes
 
-Every recipe except the stack recipe is optional. Each README holds that recipe's conditions and caveats. The profile columns match each profile's README: **default** is part of that profile's setup, **offered** is proposed at setup, **when needed** is adopted when the "Use when" condition arises, and **—** is not used in that profile.
+Every recipe except the stack recipe is optional. Each README holds that recipe's conditions and caveats. The profile columns match each profile's README: **default** is part of that profile's setup, **offered** is proposed at the stated moment, **opt-in** is set up only when the owner selects it in the bootstrap prompt, **when needed** is adopted when the "Use when" condition arises, and **—** is not used in that profile.
 
 | Recipe | Use when | Brings | Sprint | Production |
 | --- | --- | --- | --- | --- |
 | [Next.js full-stack](recipes/next-fullstack/README.md) | Stack recipe for a TypeScript Next.js app. | `files/`: CI workflow, ESLint, Prettier, `.nvmrc` | stack, without its CI step | stack |
 | [CI strategy](recipes/ci-strategy/README.md) | Read at every Production setup. Standard is the default; Budget-conscious skips draft PR jobs until the user approves ready for review. | `examples/`: budget workflows; `AGENTS-section.md` for Budget-conscious | — | default |
-| [Claude PR review](recipes/claude-pr-review/README.md) | You want on-demand `@claude review` comments on GitHub PRs. | `files/`: workflow | — | default |
+| [Claude PR review](recipes/claude-pr-review/README.md) | You want on-demand `@claude review` comments on GitHub PRs. | `files/`: workflow | — | opt-in |
 | [Playwright E2E](recipes/playwright-e2e/README.md) | The project has browser tests and needs to choose a CI environment for them. | `files/`: container workflow | when needed | when needed |
-| [Scalability and cost planning](recipes/scalability-planning/README.md) | Most useful when databases, uploads, paid APIs, jobs or reliability needs shape early decisions. | `AGENTS-section.md`; uses the external `audit-scalability-cost` skill | — | offered |
-| [Legal planning](recipes/legal-planning/README.md) | After the first specification and before features, then a Pre-launch review. | `AGENTS-section.md`; uses the external `audit-legal-readiness` skill | when needed | offered |
+| [Scalability and cost planning](recipes/scalability-planning/README.md) | Most useful when databases, uploads, paid APIs, jobs or reliability needs shape early decisions. | `AGENTS-section.md`; uses the external `audit-scalability-cost` skill | — | offered at setup |
+| [Legal planning](recipes/legal-planning/README.md) | After the first specification and before features, then a Pre-launch review. | `AGENTS-section.md`; uses the external `audit-legal-readiness` skill | when needed | offered at setup |
 | [Test and CI review](recipes/test-ci-review/README.md) | Real tests and CI exist and feedback is slow, costly or flaky. Not a bootstrap audit. | Uses the external `audit-test-ci` skill | — | when needed |
 | [CI execution performance](recipes/ci-performance/README.md) | Bounded worker, cache and duplicate-work improvements under either strategy. | Guidance and a measured [case study](recipes/ci-performance/case-study.md) | — | when needed |
 | [Self-hosted runner](recipes/self-hosted-runner/README.md) | A trusted private repository exhausts its included GitHub Actions minutes. | `examples/`: combined workflow | — | when needed |
 | [Vercel deployment budget](recipes/vercel-deployment-budget/README.md) | A Vercel project under Budget-conscious CI hits deployment limits. | Config fragment, after a preview-dependency review | — | when needed |
-| [Seed data](recipes/seed-data/README.md) | The project has a database: invented local data that shows every state and feature, with safety guards. | `examples/`, `AGENTS-section.md` | when needed | default once there is a database |
+| [Seed data](recipes/seed-data/README.md) | The project has a database: invented local data that shows every state and feature, with safety guards. | `examples/`, `AGENTS-section.md` | when needed | offered with the first database migration |
 | [Vikunja task queue](recipes/vikunja-task-queue/README.md) | Ideas and findings arrive faster than they can be implemented, and you want a self-hosted owner/agent queue. | `examples/`, `AGENTS-section.md`, `task-sync` skill | — | when needed |
 
 How recipes are packaged:

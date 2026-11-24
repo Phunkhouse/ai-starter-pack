@@ -24,6 +24,8 @@ Follow the pack's [bootstrap prompt](../../../BOOTSTRAP.md), which sets up Produ
 
 ## Recipes and audits
 
-- **Usually adopted:** [CI strategy](../../../recipes/ci-strategy/README.md), [Claude PR review](../../../recipes/claude-pr-review/README.md), [seed data](../../../recipes/seed-data/README.md) once there is a database.
+- **Default:** [CI strategy](../../../recipes/ci-strategy/README.md).
+- **Opt-in:** [Claude PR review](../../../recipes/claude-pr-review/README.md), when the owner selects it in the bootstrap prompt.
+- **Offered with the first database migration:** [seed data](../../../recipes/seed-data/README.md).
 - **Offered at setup:** [scalability and cost planning](../../../recipes/scalability-planning/README.md) and [legal planning](../../../recipes/legal-planning/README.md).
 - **Audits:** the AI Audit Toolkit's full set, repeated after material changes, with `audit-production` and `audit-security` before each major release.
