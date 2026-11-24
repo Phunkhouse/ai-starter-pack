@@ -16,7 +16,7 @@ For mature, long-lived applications: real users, several contributors or agents 
 
 Follow the pack's [bootstrap prompt](../../../BOOTSTRAP.md), which sets up Production. It copies `template/core/` and this profile's `files/`, then composes `AGENTS.md` from the core and this profile's [AGENTS section](AGENTS-section.md).
 
-An MVP project moves here with the [upgrade guide](UPGRADE.md): a read-only gap list first, then a readiness review with `audit-production` and `audit-security`, and the move only after the owner has decided on every gap.
+An MVP project moves here with the [upgrade guide](UPGRADE.md): a read-only gap list first, then a readiness stage with `audit-production`, `audit-security` and evidence checks that records every decision in `docs/readiness.md`, and the move only after the owner has approved it and no critical or high gap is unresolved.
 
 ## Compatibility with setups from before profiles
 
