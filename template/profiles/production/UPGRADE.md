@@ -31,9 +31,9 @@ Decisions and what each one means:
 | `accepted` | The owner explicitly accepts the risk, with name, date and reason. Where the project's rules or agreements forbid accepting a kind of risk, it must be fixed instead; where they say nothing, the owner's explicit, dated acceptance is enough | Yes |
 | `backlog` | Deferred to a backlog item, with its reference | No: only medium and low gaps |
 
-The record ends with a **Move decision** line: `pending`, or `approved by <owner> on <YYYY-MM-DD> for the record at <commit>, covering <ids>`. `<commit>` is the commit of `docs/readiness.md` that the owner reviewed, so the record is committed before it is approved. An approval covers exactly that readiness state: the listed rows, each with the severity, decision and evidence it had in that commit. Compare with `git diff <commit> -- docs/readiness.md`; changes to the Move decision line and the Approval history alone do not count.
+After the gap rows comes the **Move decision** line, followed by an **Approval history** list of earlier approvals: `pending`, or `approved by <owner> on <YYYY-MM-DD> for the record at <commit>, covering <ids>`. `<commit>` is the commit of `docs/readiness.md` that the owner reviewed, so the record is committed before it is approved. An approval covers exactly that readiness state: the listed rows, each with the severity, decision and evidence it had in that commit. Compare with `git diff <commit> -- docs/readiness.md`; changes to the Move decision line and the Approval history alone do not count.
 
-- **What resets it:** a new gap, or a changed severity, decision or evidence on any row, makes that approval stale. Set the line back to `pending` and move the old line to an **Approval history** list below it. Rows that did not change keep their decisions.
+- **What resets it:** a new gap, or a changed severity, decision or evidence on any row, makes that approval stale. Set the line back to `pending` and move the old line to the Approval history with the reason it went stale. Rows that did not change keep their decisions. Refreshing a recorded revision or date while the observed state stays the same is not a change.
 - **What keeps it:** a rerun that finds the same rows unchanged.
 
 Write shareable wording only. Audit reports themselves omit credentials and personal data and redact other sensitive details, such as exploit steps. Evidence that must be kept is stored redacted in the approved private location: as the AI Audit Toolkit's handling rules say, in a public repository `docs/audits/` stays private or ignored until the fixes are in place. The committed record refers to private findings by id only.
@@ -65,7 +65,7 @@ The profile stays MVP during this whole stage. Each step names its check; skip i
    _Present when_ each item is verified with evidence or has a row in the record.
 3. **Record.** Create or update `docs/readiness.md` with every gap from the preview, the audits and the evidence checks. Keep existing rows and their decisions; add only new ones. Set `Move decision: pending` if the line is missing. If this changes the readiness state an approval covers, reset the approval as [the readiness record](#the-readiness-record) describes. _Present when_ every known gap has a row, and the Move decision is `pending` or covers exactly the current rows.
 4. **Owner decisions.** Present the record to the owner and record each decision with owner, date and reason. Critical and high gaps resolve only as `fixed` with linked evidence, or `accepted` by the owner explicitly, with a date, where the project's rules allow it; `backlog` does not resolve them. Fixes are separate, focused changes outside this guide. _Present when_ every row has a decision other than `open`.
-5. **Readiness decision.** Stop while any critical or high gap is `open` or `backlog`. Report the blockers, rewrite `docs/STATUS.md` with a link to the record and the current blockers, and end. When nothing blocks and every row is decided, ask the owner whether to move to Production on the basis of the current record, as its own question. Commit the record first, then record the answer on the Move decision line with the date, that commit and the ids it covers. _Present when_ the Move decision line approves the current record.
+5. **Readiness decision.** Stop while any critical or high gap is `open` or `backlog`, or while any other gap is still `open`. Report the blockers and the undecided gaps, rewrite `docs/STATUS.md` with a link to the record and both lists, and end. When nothing blocks and every row is decided, ask the owner whether to move to Production on the basis of the current record, as its own question. Commit the record first, then record the answer on the Move decision line with the date, that commit and the ids it covers. _Present when_ the Move decision line approves the current record.
 
 ## 3. Move
 
@@ -98,7 +98,7 @@ Before committing:
 
 Before opening the PR, check its description the same way. It gives the decision summary and links the record, never the reports. Evidence that must be kept stays redacted in its approved private location.
 
-Use `chore: upgrade to the Production profile` as the commit subject, through a PR when the project has a remote. A Readiness stage that ends at a blocker commits only `docs/readiness.md`, `docs/STATUS.md` and the backlog entries its decisions point to, under the same checks, as `docs: record Production readiness decisions`.
+Use `chore: upgrade to the Production profile` as the commit subject, through a PR when the project has a remote. A Readiness stage that stops at step 5 commits only `docs/readiness.md`, `docs/STATUS.md` and the backlog entries its decisions point to, under the same checks, as `docs: record Production readiness decisions`.
 
 ## 4. Confirm
 
