@@ -31,10 +31,18 @@ Decisions and what each one means:
 | `accepted` | The owner explicitly accepts the risk, with name, date and reason. Where the project's rules or agreements forbid accepting a kind of risk, it must be fixed instead; where they say nothing, the owner's explicit, dated acceptance is enough | Yes |
 | `backlog` | Deferred to a backlog item, with its reference | No: only medium and low gaps |
 
-After the gap rows comes the **Move decision** line, followed by an **Approval history** list of earlier approvals: `pending`, or `approved by <owner> on <YYYY-MM-DD> for the record at <commit>, covering <ids>`. `<commit>` is the commit of `docs/readiness.md` that the owner reviewed, so the record is committed before it is approved. An approval covers exactly that readiness state: the listed rows, each with the severity, decision and evidence it had in that commit. Compare with `git diff <commit> -- docs/readiness.md`; changes to the Move decision line and the Approval history alone do not count.
+After the gap rows comes the **Move decision** line, followed by an **Approval history** list of earlier approvals: `pending`, or `approved by <owner> on <YYYY-MM-DD> for the record at <commit>, covering <ids>`. `<ids>` lists every gap id the owner reviewed, or `none` when the record has no gaps. `<commit>` is the commit of `docs/readiness.md` that the owner reviewed, so the record is committed before it is approved. An approval covers exactly that readiness state: the ids it lists, the ids in the record now and the ids in that commit must be the same set, and each row must be unchanged from that commit. Compare with `git diff <commit> -- docs/readiness.md`; changes to the Move decision line and the Approval history alone do not count.
 
 - **What resets it:** a new gap, or a changed severity, decision or evidence on any row, makes that approval stale. Set the line back to `pending` and move the old line to the Approval history with the reason it went stale. Rows that did not change keep their decisions. Refreshing a recorded revision or date while the observed state stays the same is not a change.
 - **What keeps it:** a rerun that finds the same rows unchanged.
+
+The pack's `scripts/check-readiness.py` reports the record's mechanical state, read-only: run `python3 <pack>/scripts/check-readiness.py <project>`. It checks:
+- format errors: rows with an unknown severity or decision, a decision missing its owner, date, reason or reference, and a missing or unreadable Move decision line;
+- blocking and undecided gaps;
+- whether the approval names an existing commit, and its covered ids, the current ids and that commit's ids are the same set with every row unchanged;
+- whether `docs/STATUS.md` has a Markdown link to the record and names every blocking gap, by exact id, in its blockers section.
+
+It reads only the record, so finding new gaps stays the preview's job, and its output is evidence: the rules in this guide decide.
 
 Write shareable wording only. Audit reports themselves omit credentials and personal data and redact other sensitive details, such as exploit steps. Evidence that must be kept is stored redacted in the approved private location: as the AI Audit Toolkit's handling rules say, in a public repository `docs/audits/` stays private or ignored until the fixes are in place. The committed record refers to private findings by id only.
 
@@ -69,7 +77,7 @@ The profile stays MVP during this whole stage. Each step names its check; skip i
 
 ## 3. Move
 
-Run only when all of these hold; otherwise the profile stays MVP:
+Run only when all of these hold, which `scripts/check-readiness.py` reports as "Move conditions: met"; otherwise the profile stays MVP:
 - every current gap has a decision other than `open`;
 - no critical or high gap is unresolved;
 - the Move decision line approves the current record: it covers exactly the current rows, and none of them differs from the approved commit.
@@ -102,7 +110,7 @@ Use `chore: upgrade to the Production profile` as the commit subject, through a 
 
 ## 4. Confirm
 
-Run the preview again. It reads decisions from `docs/readiness.md`, never from `docs/STATUS.md`, so a rewritten status cannot reopen an accepted gap or hide an open one.
+Run the preview again, together with `scripts/check-readiness.py`. It reads decisions from `docs/readiness.md`, never from `docs/STATUS.md`, so a rewritten status cannot reopen an accepted gap or hide an open one.
 
 - **When the move was approved:** every Readiness and Move step must report present, apart from owner actions still pending.
 - **When the move is pending:** the profile must still be MVP, and the blockers that `docs/STATUS.md` names must match the record's blocking rows. A later handoff may have rewritten `STATUS.md`; report the mismatch and, with the owner's approval, restore the link to the record and the current blockers.
