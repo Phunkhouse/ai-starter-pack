@@ -64,6 +64,28 @@ CASES = [
         ["template/profiles/sprint/files/README.md: missing file docs/decisions/README.md (in the sprint profile)"],
     ),
     (
+        "a profile with files-from receives the named profile's files",
+        {
+            "template/profiles/mvp/files-from": "production\n",
+            "template/profiles/mvp/files/docs/runbook.md": "# Runbook\n",
+            "template/core/AGENTS.md": "[d](docs/decisions/README.md) [r](docs/runbook.md)\n",
+        },
+        [
+            "template/core/AGENTS.md: missing file docs/decisions/README.md (in the sprint profile)",
+            "template/core/AGENTS.md: missing file docs/runbook.md (in the production profile)",
+            "template/core/AGENTS.md: missing file docs/runbook.md (in the sprint profile)",
+        ],
+    ),
+    (
+        "a named profile's files are also checked in the profile that includes them",
+        {
+            "template/profiles/mvp/files-from": "production\n",
+            "template/profiles/mvp/files/docs/runbook.md": "# Runbook\n",
+            "template/profiles/production/files/README.md": "[s](docs/SPEC.md#scope) [r](docs/runbook.md)\n",
+        },
+        ["template/profiles/production/files/README.md: missing file docs/runbook.md (in the production profile)"],
+    ),
+    (
         "ordinary repository links are unchanged",
         {"README.md": "[ok](template/core/AGENTS.md) [bad](nope.md)\n", "template/core/AGENTS.md": "# A\n"},
         ["README.md: missing file nope.md"],

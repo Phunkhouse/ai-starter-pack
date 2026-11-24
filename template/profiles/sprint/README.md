@@ -68,4 +68,4 @@ approval. Do not add a test runner or any behavior before I approve.
 
 ## When it outgrows the profile
 
-Signs: the deadline keeps moving, real users arrive, a second person joins, or the work will be maintained. Ask the owner to move the project to MVP. The upgrade adds mechanisms to what exists and never resets the project.
+Signs: the deadline keeps moving, real users arrive, a second person joins, or the work will be maintained. Ask the owner to move the project to MVP with the [upgrade guide](../mvp/UPGRADE.md). The upgrade adds mechanisms to what exists and never resets the project.
