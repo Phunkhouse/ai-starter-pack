@@ -45,7 +45,7 @@ The order matters. Setup ends with a passing `verify` and one approval; tests an
 
 ```text
 This is a Sprint project (starter pack, template/profiles/sprint).
-The brief: <paste the assignment or describe the goal>.
+The brief: <paste the assignment, describe the goal, or name a discovery handover such as docs/discovery/<slug>/handover.md>.
 Deadline: <date, time and time zone>. Stack: <stack>.
 Git remote: <git@HOST_ALIAS:OWNER/REPOSITORY.git>.
 
@@ -62,7 +62,7 @@ approval. Do not add a test runner or any behavior before I approve.
 
 ## Recipes and audits
 
-- **Recipes:** none by default. Add one only when the work needs it; [seed data](../../../recipes/seed-data/README.md) when there is a database.
+- **Recipes:** none by default. Add one only when the work needs it; [seed data](../../../recipes/seed-data/README.md) when there is a database, [discovery handover](../../../recipes/discovery/README.md) when the goal is not yet clear or the work starts from a handover.
 - **Audits:** before handing in, `audit-security` for secrets and input handling and `audit-correctness` on the core logic, from the AI Audit Toolkit. A risk trigger in the core can call for more.
 - **CI:** optional. One workflow that runs the verify command is enough; a green run can matter to someone reviewing an assignment.
 

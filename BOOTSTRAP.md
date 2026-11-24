@@ -10,7 +10,7 @@ The target repository is at <absolute path to the new repository>.
 Its Git remote is <SSH URL with my host alias, e.g. git@github-work:owner/repo.git>.
 The governance profile is <Production (default) or MVP>.
 The stack recipe is <next-fullstack, or none>.
-The optional recipes are <any of: claude-pr-review, playwright-e2e, seed-data, test-ci-review, ci-performance, self-hosted-runner, vercel-deployment-budget, vikunja-task-queue; or none>.
+The optional recipes are <any of: claude-pr-review, discovery, playwright-e2e, seed-data, test-ci-review, ci-performance, self-hosted-runner, vercel-deployment-budget, vikunja-task-queue; or none>.
 The CI strategy is <Standard (default) or Budget-conscious>.
 Legal planning is <enabled or omitted>.
 Scalability and cost planning is <offer (default), enabled or omitted>.

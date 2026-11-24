@@ -73,6 +73,7 @@ Every recipe except the stack recipe is optional. Each README holds that recipe'
 | [Self-hosted runner](recipes/self-hosted-runner/README.md) | A trusted private repository exhausts its included GitHub Actions minutes. | `examples/`: combined workflow | — | when needed | when needed |
 | [Vercel deployment budget](recipes/vercel-deployment-budget/README.md) | A Vercel project under Budget-conscious CI hits deployment limits. | Config fragment, after a preview-dependency review | — | when needed | when needed |
 | [Seed data](recipes/seed-data/README.md) | The project has a database: invented local data that shows every state and feature, with safety guards. | `examples/`, `AGENTS-section.md` | when needed | offered with the first database migration | offered with the first database migration |
+| [Discovery handover](recipes/discovery/README.md) | The problem, users or scope are not settled yet, or the project starts from an AI Discovery Toolkit handover. | `AGENTS-section.md`; uses the external `discovery-rapid`, `discovery-standard` and `discovery-handover` skills | when needed | offered at setup | offered at setup |
 | [Vikunja task queue](recipes/vikunja-task-queue/README.md) | Ideas and findings arrive faster than they can be implemented, and you want a self-hosted owner/agent queue. | `examples/`, `AGENTS-section.md`, `task-sync` skill | — | when needed | when needed |
 
 How recipes are packaged:
