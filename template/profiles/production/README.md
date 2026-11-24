@@ -19,11 +19,13 @@ Follow the pack's [bootstrap prompt](../../../BOOTSTRAP.md), which sets up Produ
 ## Compatibility with setups from before profiles
 
 - **Existing projects keep the revision they adopted.** Their copied files do not change until the owner applies a newer pack revision to them. Without a Governance section they are treated as Production.
-- **New Production setups get the new core rules as well:** Governance, fact status, the conflict rule, scope and evidence, handover through `docs/STATUS.md`, and risk triggers. Every earlier rule is still there: the composed core and Production section were compared sentence by sentence with the earlier `AGENTS.md`, and the only reworded sentences are the one-line list of documents, now split between the core map and this profile's "further sources" line.
+- **New Production setups get the new core rules as well:** Governance, fact status, the conflict rule, scope and evidence, handover through `docs/STATUS.md`, and risk triggers. Every earlier rule is still there: the composed core and Production section were compared sentence by sentence with the earlier `AGENTS.md`, and the only reworded sentences are the one-line list of documents, now split between the core map and this profile's "further sources" line. CI enforces this with `scripts/check-production-parity.py` against a stored copy of the earlier file.
 - **Setup steps that copied only `template/core/` must change.** The core no longer contains the README, SPEC, design or decision templates, nor the validation, architecture, UI, testing, milestone and pull request rules. A script, prompt or habit that copied only `template/core/` now also needs to copy `template/profiles/production/files/` and paste this profile's [AGENTS section](AGENTS-section.md).
 
 ## Recipes and audits
 
-- **Usually adopted:** [CI strategy](../../../recipes/ci-strategy/README.md), [Claude PR review](../../../recipes/claude-pr-review/README.md), [seed data](../../../recipes/seed-data/README.md) once there is a database.
+- **Default:** [CI strategy](../../../recipes/ci-strategy/README.md).
+- **Opt-in:** [Claude PR review](../../../recipes/claude-pr-review/README.md), when the owner selects it in the bootstrap prompt.
+- **Offered with the first database migration:** [seed data](../../../recipes/seed-data/README.md).
 - **Offered at setup:** [scalability and cost planning](../../../recipes/scalability-planning/README.md) and [legal planning](../../../recipes/legal-planning/README.md).
 - **Audits:** the AI Audit Toolkit's full set, repeated after material changes, with `audit-production` and `audit-security` before each major release.

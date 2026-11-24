@@ -12,7 +12,16 @@ The order matters. Setup ends with a passing `verify` and one approval; tests an
 
 **How long it takes.** On a disposable Next.js project with a short brief (2026-11-24, packages already in the local pnpm store), the mechanical steps 1–4 took about 10 seconds and the first `verify` about 7 seconds. A cold install adds download time. Filling in the specification from a brief is judgement work and depends on the brief; a few minutes is realistic for a short assignment, but the whole setup has not been timed end to end with a real brief, so treat "under five minutes" as a target, not a measurement.
 
-1. **Generate the project** with its official generator. For Next.js, follow the [Next.js recipe](../../../recipes/next-fullstack/README.md) steps 1–5: the generator, `packageManager`, Prettier at an exact version, and the `lint`, `typecheck`, `format` and `format:check` scripts. Skip its CI step unless the owner wants CI.
+1. **Generate the project** with its official generator. For Next.js, use the [Next.js recipe](../../../recipes/next-fullstack/README.md) like this:
+   - its step 1: the generator;
+   - instead of its step 2, copy the recipe's files **without the CI workflow**, unless the owner wants CI. Its own command would also copy `.github/workflows/ci.yml`. The core and profile copy is step 2 below.
+
+     ```sh
+     rsync -a --ignore-existing --exclude '.github/' /absolute/path/to/ai-starter-pack/recipes/next-fullstack/files/ /absolute/path/to/project/
+     ```
+
+     With CI, drop `--exclude '.github/'` and adapt the workflow as the recipe's step 6 describes, so it runs the verify command;
+   - its steps 3–5: `packageManager`, Prettier at an exact version, and the `lint`, `typecheck`, `format` and `format:check` scripts.
 2. **Copy the core and this profile**, including dotfiles:
 
    ```sh
